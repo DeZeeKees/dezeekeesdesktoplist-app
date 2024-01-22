@@ -27,6 +27,12 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 
+	if GlobalConfig.MALClientID == "" {
+		panic("MALClientID is not set")
+	}
+
+	OAuthConfig.ClientID = GlobalConfig.MALClientID
+
 	runtime.EventsOn(ctx, "startup:success", func(data ...interface{}) {
 
 		jsonString, err := LoadAppDataFile("token.enc")
@@ -68,7 +74,7 @@ func (a *App) StartAuthProcess() error {
 		return err
 	}
 
-	authUrl := oauthConfig.AuthCodeURL(
+	authUrl := OAuthConfig.AuthCodeURL(
 		state,
 		oauth2.AccessTypeOffline,
 		oauth2.SetAuthURLParam("code_challenge", CodeVerifier),
@@ -80,6 +86,10 @@ func (a *App) StartAuthProcess() error {
 }
 
 func (a *App) GetRequest(url string) string {
+
+	if AccessToken == nil || !AccessToken.Valid() {
+		return "[]"
+	}
 
 	fullBearer := "Bearer " + AccessToken.AccessToken
 

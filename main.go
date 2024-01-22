@@ -12,23 +12,21 @@ import (
 //go:embed all:frontend/build
 var assets embed.FS
 
-var appConfig AppConfig
+var GlobalConfig AppConfig
 
 func main() {
+
+	err := error(nil)
+
+	GlobalConfig, err = InitConfig()
+	if err != nil {
+		panic(err)
+	}
 
 	if len(os.Args) > 1 {
 		arg := os.Args[1]
 		SendToRunningInstance(arg)
 		return
-	}
-
-	appConfig, err := InitConfig()
-	if err != nil {
-		panic(err)
-	}
-
-	if appConfig.MALClientID == "" {
-		panic("MALClientID not set in config file")
 	}
 
 	// Create an instance of the app structure

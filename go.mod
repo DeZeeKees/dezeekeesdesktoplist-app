@@ -1,4 +1,4 @@
-module changeme
+module dezeekeesdesktoplist-app
 
 go 1.21
 

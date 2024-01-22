@@ -15,27 +15,34 @@ type AppConfig struct {
 	IPCPort     string `toml:"ipc_port" env:"IPC_PORT" default:"8499"`
 }
 
-var appConfig2 AppConfig
-
 func InitConfig() (AppConfig, error) {
+
+	var config AppConfig
 
 	configFile := GetConfigPath("config")
 
 	//check if congif file exists if not create it
 	_, err := os.Stat(configFile)
 	if errors.Is(err, os.ErrNotExist) {
-		os.Create(configFile)
+		file, err := os.Create(configFile)
+
+		if err != nil {
+			fmt.Println(err)
+			return config, err
+		}
+
+		file.WriteString("mal_client_id = \"\"\nipc_port = \"8499\"")
 	}
 
 	// reading config file
-	err = cleanenv.ReadConfig(configFile, &appConfig)
+	err = cleanenv.ReadConfig(configFile, &config)
 
 	if err != nil {
 		fmt.Println(err)
-		return appConfig, err
+		return config, err
 	}
 
-	return appConfig, nil
+	return config, nil
 }
 
 func GetConfigPath(fileName string) string {

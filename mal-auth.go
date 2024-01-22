@@ -19,8 +19,7 @@ var (
 	redirectURL = "dezeekeesdesktoplist://auth/callback"
 )
 
-var oauthConfig = oauth2.Config{
-	ClientID: appConfig.MALClientID,
+var OAuthConfig = oauth2.Config{
 	Endpoint: oauth2.Endpoint{
 		AuthURL:  "https://myanimelist.net/v1/oauth2/authorize",
 		TokenURL: "https://myanimelist.net/v1/oauth2/token",
@@ -35,7 +34,7 @@ var stopServer chan struct{} // Channel to send stop signal
 var wg sync.WaitGroup
 
 func StartTCPServer(a *App) {
-	listener, err := net.Listen("tcp", ":"+appConfig.IPCPort)
+	listener, err := net.Listen("tcp", ":"+GlobalConfig.IPCPort)
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		return
@@ -98,7 +97,7 @@ func HandleConnection(conn net.Conn, a *App) {
 }
 
 func SendToRunningInstance(msg string) {
-	conn, err := net.Dial("tcp", "localhost:"+appConfig.IPCPort)
+	conn, err := net.Dial("tcp", "localhost:"+GlobalConfig.IPCPort)
 	if err != nil {
 		fmt.Println("Error connecting:", err.Error())
 		return
@@ -112,6 +111,8 @@ func SendToRunningInstance(msg string) {
 		fmt.Println("Error sending message:", err.Error())
 		return
 	}
+
+	fmt.Scanln()
 }
 
 func HandleAuthCallback(codeString string) (*oauth2.Token, error) {
@@ -123,10 +124,10 @@ func HandleAuthCallback(codeString string) (*oauth2.Token, error) {
 		return nil, err
 	}
 
-	token, err := oauthConfig.Exchange(
+	token, err := OAuthConfig.Exchange(
 		context.Background(),
 		parsed.Query().Get("code"),
-		oauth2.SetAuthURLParam("client_id", appConfig.MALClientID),
+		oauth2.SetAuthURLParam("client_id", GlobalConfig.MALClientID),
 		oauth2.SetAuthURLParam("code_verifier", CodeVerifier),
 		oauth2.SetAuthURLParam("grant_type", "authorization_code"),
 	)

@@ -15,7 +15,13 @@
 </main>
 
 <script>
+    import { title } from '$lib/store';
     import { StartAuthProcess } from '$lib/wailsjs/go/main/App';
+    import { onMount } from 'svelte';
+
+    onMount(() => {
+        title.set('Login');
+    })
 </script>
 
 <style lang="less">
