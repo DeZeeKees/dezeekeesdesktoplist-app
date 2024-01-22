@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -28,7 +29,13 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 
 	if GlobalConfig.MALClientID == "" {
-		panic("MALClientID is not set")
+		runtime.MessageDialog(ctx, runtime.MessageDialogOptions{
+			Title:   "Error",
+			Message: "Please set your MAL client ID in the config file.",
+			Type:    runtime.ErrorDialog,
+		})
+
+		os.Exit(1)
 	}
 
 	OAuthConfig.ClientID = GlobalConfig.MALClientID
