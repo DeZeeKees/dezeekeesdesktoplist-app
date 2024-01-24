@@ -8,7 +8,7 @@
     {:else if currentTab === "updates" && releaseInfo !== undefined}
         <div class="updates">
             
-            {#if !releaseInfo.isLatest}
+            {#if releaseInfo.isLatest}
                 <h2>You are up to date</h2>
                 <p>Current version: {version}</p>
                 <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
