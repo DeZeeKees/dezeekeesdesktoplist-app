@@ -3,9 +3,17 @@
     <button class="hamburger">
         <span class="material-symbols-outlined">menu</span>
         <div class="menu">
-            <a href="/" class={$page.url.pathname === '/' ? 'active' : ''}>Your List</a>
-            <a href="/seasonal" class={$page.url.pathname === '/seasonal' ? 'active' : ''}>Seasonal</a>
-            <a href="/ranking" class={$page.url.pathname === '/ranking' ? 'active' : ''}>Ranking</a>
+
+            <div class="top">
+                <a href="/" class={$page.url.pathname === '/' ? 'active' : ''}>Your List</a>
+                <a href="/seasonal" class={$page.url.pathname === '/seasonal' ? 'active' : ''}>Seasonal</a>
+                <a href="/ranking" class={$page.url.pathname === '/ranking' ? 'active' : ''}>Ranking</a>
+            </div>
+
+            <div class="bottom">
+                <a href="/settings" class={$page.url.pathname === '/settings' ? 'active' : ''}>Settings</a>
+            </div>
+
         </div>
     </button>
     
@@ -74,6 +82,10 @@
                 pointer-events: none;
                 user-select: none;
                 transition: all 0.2s ease-in-out;
+
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
 
                 a {
                     width: 100%;
