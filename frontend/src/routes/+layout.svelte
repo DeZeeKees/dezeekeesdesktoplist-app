@@ -9,6 +9,9 @@
     import { EventsEmit, EventsOn } from '$lib/wailsjs/runtime'
     import { goto } from '$app/navigation'
     import { popover, title } from "$lib/store";
+    import { page } from "$app/stores";
+
+    let showTitlebar = true
 
     EventsOn('svelte:goto', (data) => {
         goto(data)
@@ -17,7 +20,11 @@
     EventsEmit('startup:success')
 
     function GlobalKeyDown(event) {
-        if($popover.element !== undefined && $popover.element.classList.contains("inactive") === false) {
+        if(
+            $popover.element !== undefined &&
+            $page.url.pathname === '/'&&
+            $popover.element.classList.contains("inactive") === false
+        ) {
             switch(event.key) {
                 case "Escape":
                     $popover.close()
@@ -27,10 +34,23 @@
                     break;
             }
         }
+
+        if(event.ctrlKey && event.key === "F11") {
+            event.preventDefault()
+            showTitlebar = !showTitlebar
+
+            if(showTitlebar) {
+                document.documentElement.style.setProperty('--titlebar-height', '2rem');
+            } else {
+                document.documentElement.style.setProperty('--titlebar-height', '0rem');
+            }
+        }
     }
 </script>
 
-<Titlebar title={$title} />
+{#if showTitlebar}
+    <Titlebar title={$title} />
+{/if}
 
 <div id="wrapper" class="wrapper">
     <slot/>
@@ -77,6 +97,8 @@
 
 .wrapper {
     position: relative;
+    height: calc(100vh - var(--titlebar-height));
+    overflow: hidden;
 }
 
 :global(.toast-down) {

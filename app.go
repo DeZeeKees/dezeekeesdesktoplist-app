@@ -18,6 +18,22 @@ type App struct {
 	ctx context.Context
 }
 
+type Release struct {
+	Assets []struct {
+		Name               string `json:"name"`
+		BrowserDownloadURL string `json:"browser_download_url"`
+	} `json:"assets"`
+	TagName    string `json:"tag_name"`
+	PreRelease bool   `json:"prerelease"`
+	Published  string `json:"published_at"`
+	HtmlURL    string `json:"html_url"`
+}
+
+type ReleaseInfo struct {
+	IsLatest bool    `json:"isLatest"`
+	Release  Release `json:"release"`
+}
+
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{}
@@ -59,6 +75,12 @@ func (a *App) startup(ctx context.Context) {
 
 		if AccessToken == nil || !AccessToken.Valid() {
 			runtime.EventsEmit(ctx, "svelte:goto", "/login")
+		}
+
+		err = SetReleaseInfo()
+
+		if err != nil {
+			fmt.Println("Error setting release info:", err)
 		}
 	})
 }
@@ -168,4 +190,31 @@ func (a *App) PatchRequest(url string, json string) string {
 	}
 
 	return string(bodyBytes)
+}
+
+func (a *App) GetVersion() string {
+	return Version
+}
+
+func (a *App) GetReleaseInfo(prerelease bool) ReleaseInfo {
+	return CurrentReleaseInfo
+}
+
+func (a *App) InstallUpdate() string {
+
+	err := DownloadInstaller()
+
+	if err != nil {
+		return err.Error()
+	}
+
+	err = RunInstaller()
+
+	if err != nil {
+		return err.Error()
+	}
+
+	os.Exit(0)
+
+	return "success"
 }

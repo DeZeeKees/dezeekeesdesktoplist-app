@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"os"
 
 	"github.com/wailsapp/wails/v2"
@@ -13,6 +14,10 @@ import (
 var assets embed.FS
 
 var GlobalConfig AppConfig
+
+var Version string
+
+var CurrentReleaseInfo ReleaseInfo
 
 func main() {
 
@@ -28,6 +33,8 @@ func main() {
 		SendToRunningInstance(arg)
 		return
 	}
+
+	fmt.Println("App version: " + Version)
 
 	// Create an instance of the app structure
 	app := NewApp()

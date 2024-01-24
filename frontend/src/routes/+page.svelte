@@ -179,7 +179,7 @@
     }
 
     main {
-        height: calc((100vh - var(--titlebar-height)) - 2.5rem);
+        height: calc(100% - 2.5rem);
         padding: 1rem;
         overflow-y: scroll;
         gap: 1rem;
