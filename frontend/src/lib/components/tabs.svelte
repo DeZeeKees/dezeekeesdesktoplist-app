@@ -76,29 +76,41 @@
                 left: -10rem;
                 width: 10rem;
                 height: calc(100vh - var(--titlebar-height));
-                border-right: solid 0.1rem var(--text-dark);
+                box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
                 background-color: #fff;
                 z-index: 10;
                 pointer-events: none;
                 user-select: none;
                 transition: all 0.2s ease-in-out;
+                padding-inline: 0.5rem;
+                padding-block: 0.5rem;
 
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
 
-                a {
-                    width: 100%;
-                    height: 2.5rem;
-                    padding: 0 1rem;
+                .top {
                     display: flex;
-                    justify-content: flex-start;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+
+                a {
+                    display: flex;
+                    justify-content: center;
                     align-items: center;
+                    padding: 0.5rem;
+                    border-radius: 1rem;
                     color: var(--text-dark);
                     text-decoration: none;
                     transition: all 0.2s ease-in-out;
 
-                    &:hover, &.active {
+                    &:hover {
+                        background-color: var(--mal-blue);
+                        color: white;
+                    }
+
+                    &.active {
                         background-color: var(--mal-blue);
                         color: white;
                     }
