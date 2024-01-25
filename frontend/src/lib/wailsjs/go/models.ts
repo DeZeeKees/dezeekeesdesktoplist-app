@@ -2,6 +2,7 @@ export namespace main {
 	
 	export class AppSettings {
 	    usePrerelease: boolean;
+	    yourListCardSizeMultiplier: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppSettings(source);
@@ -10,6 +11,7 @@ export namespace main {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.usePrerelease = source["usePrerelease"];
+	        this.yourListCardSizeMultiplier = source["yourListCardSizeMultiplier"];
 	    }
 	}
 	export class  {

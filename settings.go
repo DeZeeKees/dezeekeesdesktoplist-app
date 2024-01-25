@@ -3,7 +3,8 @@ package main
 import "encoding/json"
 
 type AppSettings struct {
-	UsePrerelease bool `json:"usePrerelease"`
+	UsePrerelease              bool    `json:"usePrerelease"`
+	YourListCardSizeMultiplier float64 `json:"yourListCardSizeMultiplier"`
 }
 
 var Settings AppSettings

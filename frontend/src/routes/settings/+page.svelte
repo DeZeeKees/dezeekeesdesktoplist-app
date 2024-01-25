@@ -3,8 +3,22 @@
 <main>
     {#if currentTab === "general" && releaseInfo !== undefined}
         <div class="settings">
-            <label for="use_prerelease">Use Pre-release</label>
-            <input type="checkbox" name="use_prerelease" bind:checked={settings.usePrerelease}>
+            <h2>General</h2>
+
+            <div class="row">
+                <label for="use_prerelease">Use Pre-release</label>
+                <input type="checkbox" name="use_prerelease" bind:checked={settings.usePrerelease}>
+            </div>
+            
+            <h2>Your List</h2>
+            
+            <div class="row">
+                <label for="card_size_multiplier">Card Size Multiplier {settings.yourListCardSizeMultiplier}</label>
+                <div class="slider">
+                    <button on:click={handleSliderReset}>Reset</button>
+                    <input class="" type="range" min="40" max="200" name="card_size_multiplier" on:input={handleSliderChange} bind:this={CardSizeRangeElement}>
+                </div>
+            </div>
 
             <div class="buttons">
                 <button on:click={handleSaveSettings}>Save</button>
@@ -58,14 +72,18 @@
 
     let settings = {
         usePrerelease: false,
+        yourListCardSizeMultiplier: 1
     }
+
+    /** @type {HTMLInputElement}*/
+    let CardSizeRangeElement;
 
     onMount(async () => {
         version = await GetVersion();
         releaseInfo = await GetReleaseInfo(true);
         settings = await GetSettings();
 
-        console.log(releaseInfo);
+        CardSizeRangeElement.value = (settings.yourListCardSizeMultiplier * 100).toString();
 
         title.set(`Settings - General`);
     });
@@ -109,6 +127,15 @@
             icon: "success",
             title: "Settings saved",
         });
+    }
+
+    function handleSliderReset() {
+        CardSizeRangeElement.value = "100";
+        settings.yourListCardSizeMultiplier = 1;
+    }
+
+    function handleSliderChange(event) {
+        settings.yourListCardSizeMultiplier = event.target.value / 100;
     }
 </script>
 
@@ -177,6 +204,68 @@
 
             &:hover {
                 background-color: var(--mal-blue-dark);
+            }
+        }
+    }
+}
+
+.settings {
+    padding-inline: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    h2 {
+        margin: 0;
+    }
+
+    button {
+        background-color: var(--mal-blue);
+        color: var(--text-white);
+        border: none;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+        margin-right: 10px;
+
+        &:hover {
+            background-color: var(--mal-blue-dark);
+        }
+    }
+
+    .slider {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        
+        // type range
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 20px;
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--text-light);
+            outline: none;
+            border-radius: 100px;
+            opacity: 0.7;
+            transition: opacity 0.2s ease-in-out;
+
+            &:hover {
+                opacity: 1;
+            }
+
+            &::-webkit-slider-thumb {
+                appearance: none;
+                width: 20px;
+                height: 20px;
+                background-color: var(--mal-blue);
+                border-radius: 100%;
+                cursor: pointer;
             }
         }
     }
