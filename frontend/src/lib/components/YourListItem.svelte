@@ -129,8 +129,8 @@
 
     .item {
         --_border-raduis: 5px;
-        width: 250px;
-        height: 350px;
+        width: calc(250px * var(--your-list-card-size-multiplier, 1));
+        height: calc(350px * var(--your-list-card-size-multiplier, 1));
         display: flex;
         justify-content: center;
         align-items: center;

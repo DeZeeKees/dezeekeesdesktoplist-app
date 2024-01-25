@@ -70,6 +70,7 @@
 
 :global(:root) {
     --titlebar-height: 2rem;
+    --your-list-card-size-multiplier: 1;
 
     --mal-blue: #2E51A2;
     --mal-blue-dark: color-mix(in srgb, black 10%, var(--mal-blue));

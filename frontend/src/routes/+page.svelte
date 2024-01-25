@@ -59,9 +59,10 @@
 
     import { title, popover, ListItems, animeCurrentTab } from "$lib/store";
     import { onMount } from "svelte";
-    import { GetRequest } from "$lib/wailsjs/go/main/App";
+    import { GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
     import Tabs from "$lib/components/tabs.svelte";
     import YourListItem from "$lib/components/YourListItem.svelte";
+    import * as styleManager from "$lib/styleManager";
 
     const tabList = [
         {name: "Watching"},
@@ -71,7 +72,6 @@
         {name: "All"},
         {name: "Plan to Watch"}
     ]
-
     
     let ListResponse = undefined
     let itemContainer
@@ -83,7 +83,17 @@
 
     const baseUrl = "https://api.myanimelist.net/v2/users/@me/animelist?limit=" + fetchInterval + "&fields=" + fields
 
+    let settings = {
+        usePrerelease: false,
+        yourListCardSizeMultiplier: 1
+    }
+
     onMount(async () => {
+        settings = await GetSettings()
+        styleManager.set("your-list-card-size-multiplier", settings.yourListCardSizeMultiplier)
+
+        title.set("Your List - ")
+
         const MalUser = await GetRequest("https://api.myanimelist.net/v2/users/@me")
         .then(data => JSON.parse(data))
 
@@ -186,6 +196,7 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
+        align-content: flex-start;
 
         margin-right: 3px;
         transform: translate3d(0,0,0);

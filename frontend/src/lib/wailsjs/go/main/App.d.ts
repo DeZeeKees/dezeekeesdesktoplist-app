@@ -6,10 +6,14 @@ export function GetReleaseInfo(arg1:boolean):Promise<main.ReleaseInfo>;
 
 export function GetRequest(arg1:string):Promise<string>;
 
+export function GetSettings():Promise<main.AppSettings>;
+
 export function GetVersion():Promise<string>;
 
 export function InstallUpdate():Promise<string>;
 
 export function PatchRequest(arg1:string,arg2:string):Promise<string>;
+
+export function SaveSettings(arg1:string):Promise<string>;
 
 export function StartAuthProcess():Promise<void>;

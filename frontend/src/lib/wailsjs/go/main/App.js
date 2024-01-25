@@ -10,6 +10,10 @@ export function GetRequest(arg1) {
   return window['go']['main']['App']['GetRequest'](arg1);
 }
 
+export function GetSettings() {
+  return window['go']['main']['App']['GetSettings']();
+}
+
 export function GetVersion() {
   return window['go']['main']['App']['GetVersion']();
 }
@@ -20,6 +24,10 @@ export function InstallUpdate() {
 
 export function PatchRequest(arg1, arg2) {
   return window['go']['main']['App']['PatchRequest'](arg1, arg2);
+}
+
+export function SaveSettings(arg1) {
+  return window['go']['main']['App']['SaveSettings'](arg1);
 }
 
 export function StartAuthProcess() {

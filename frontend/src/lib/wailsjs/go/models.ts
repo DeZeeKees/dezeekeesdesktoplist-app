@@ -1,5 +1,19 @@
 export namespace main {
 	
+	export class AppSettings {
+	    usePrerelease: boolean;
+	    yourListCardSizeMultiplier: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new AppSettings(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.usePrerelease = source["usePrerelease"];
+	        this.yourListCardSizeMultiplier = source["yourListCardSizeMultiplier"];
+	    }
+	}
 	export class  {
 	    name: string;
 	    browser_download_url: string;
@@ -20,6 +34,7 @@ export namespace main {
 	    prerelease: boolean;
 	    published_at: string;
 	    html_url: string;
+	    message: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Release(source);
@@ -32,6 +47,7 @@ export namespace main {
 	        this.prerelease = source["prerelease"];
 	        this.published_at = source["published_at"];
 	        this.html_url = source["html_url"];
+	        this.message = source["message"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

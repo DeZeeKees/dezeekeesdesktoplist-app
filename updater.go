@@ -24,24 +24,23 @@ func getLatestRelease(preRelease bool) (Release, error) {
 		release, err = getLatestNonPreRelease()
 	}
 
-	if err != nil {
-		return Release{}, err
-	}
-
-	return release, nil
-
+	return release, err
 }
 
 func getLatestPreRelease() (Release, error) {
 	resp, err := http.Get("https://api.github.com/repos/DeZeeKees/dezeekeesdesktoplist-app/releases")
 	if err != nil {
-		return Release{}, err
+		return Release{
+			Message: "Error getting latest release: " + err.Error(),
+		}, err
 	}
 	defer resp.Body.Close()
 
 	var releases []Release
 	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
-		return Release{}, err
+		return Release{
+			Message: "Error getting latest release: " + err.Error(),
+		}, err
 	}
 
 	for _, release := range releases {
@@ -50,35 +49,40 @@ func getLatestPreRelease() (Release, error) {
 		}
 	}
 
-	return Release{}, nil
+	return Release{
+		Message: "No pre-release found",
+	}, nil
 }
 
 func getLatestNonPreRelease() (Release, error) {
 	resp, err := http.Get("https://api.github.com/repos/DeZeeKees/dezeekeesdesktoplist-app/releases/latest")
 	if err != nil {
-		return Release{}, err
+		return Release{
+			Message: "Error getting latest release: " + err.Error(),
+		}, err
 	}
 	defer resp.Body.Close()
 
 	var releases Release
 	if err := json.NewDecoder(resp.Body).Decode(&releases); err != nil {
-		return Release{}, err
+		return Release{
+			Message: "Error getting latest release: " + err.Error(),
+		}, err
 	}
 
-	return Release{}, nil
+	return releases, nil
 }
 
 func SetReleaseInfo() error {
-	release, err := getLatestRelease(true)
-
-	if err != nil {
-		fmt.Println("Error getting latest release:", err)
-		return err
-	}
+	release, _ := getLatestRelease(Settings.UsePrerelease)
 
 	CurrentReleaseInfo = ReleaseInfo{
 		IsLatest: release.TagName == Version,
 		Release:  release,
+	}
+
+	if release.Message != "" {
+		CurrentReleaseInfo.IsLatest = true
 	}
 
 	return nil

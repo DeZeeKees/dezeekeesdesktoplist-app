@@ -2,30 +2,51 @@
 
 <main>
     {#if currentTab === "general" && releaseInfo !== undefined}
-        <h2>General</h2>
-        <p>Use Prerelease</p>
-        <input type="checkbox">
-    {:else if currentTab === "updates" && releaseInfo !== undefined}
-        <div class="updates">
-            
-            {#if releaseInfo.isLatest}
-                <h2>You are up to date</h2>
-                <p>Current version: {version}</p>
-                <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
-                <div class="buttons">
-                    <button on:click={() => BrowserOpenURL(releaseInfo.release.html_url)}>Release notes</button>
-                </div>
-            {:else}
-                <h2>Update available</h2>
-                <p>Current version: {version}</p>
-                <p>Latest version: {releaseInfo.release.tag_name}</p>
-                <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
-                <div class="buttons">
-                    <button on:click={() => BrowserOpenURL(releaseInfo.release.html_url)}>Release notes</button>
-                    <button on:click={handleDownload}>Download</button>
-                </div>
-            {/if}
+        <div class="settings">
+            <h2>General</h2>
 
+            <div class="row">
+                <label for="use_prerelease">Use Pre-release</label>
+                <input type="checkbox" name="use_prerelease" bind:checked={settings.usePrerelease}>
+            </div>
+            
+            <h2>Your List</h2>
+            
+            <div class="row">
+                <label for="card_size_multiplier">Card Size Multiplier {settings.yourListCardSizeMultiplier}</label>
+                <div class="slider">
+                    <button on:click={handleSliderReset}>Reset</button>
+                    <input class="" type="range" min="40" max="200" name="card_size_multiplier" on:input={handleSliderChange} bind:this={CardSizeRangeElement}>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button on:click={handleSaveSettings}>Save</button>
+            </div>
+        </div>
+    {:else if currentTab === "updates" && releaseInfo !== undefined}
+        <div class="updates_container">
+            <div class="updates">
+                
+                {#if releaseInfo.isLatest}
+                    <h2>You are up to date</h2>
+                    <p>Current version: {version}</p>
+                    <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
+                    <div class="buttons">
+                        <button on:click={() => BrowserOpenURL(releaseInfo.release.html_url)}>Release notes</button>
+                    </div>
+                {:else}
+                    <h2>Update available</h2>
+                    <p>Current version: {version}</p>
+                    <p>Latest version: {releaseInfo.release.tag_name}</p>
+                    <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
+                    <div class="buttons">
+                        <button on:click={() => BrowserOpenURL(releaseInfo.release.html_url)}>Release notes</button>
+                        <button on:click={handleDownload}>Download</button>
+                    </div>
+                {/if}
+
+            </div>
         </div>
     {:else}
         <h1>Loading...</h1>
@@ -33,11 +54,12 @@
 </main>
 
 <script>
-    import { GetVersion, GetReleaseInfo, InstallUpdate } from "$lib/wailsjs/go/main/App";
+    import { GetVersion, GetReleaseInfo, InstallUpdate, GetSettings, SaveSettings } from "$lib/wailsjs/go/main/App";
     import { onMount } from "svelte";
     import Tabs from "$lib/components/tabs.svelte";
     import { title } from "$lib/store";
     import { BrowserOpenURL } from "$lib/wailsjs/runtime/runtime";
+    import { Toast } from "$lib";
 
     let version;
     let releaseInfo = undefined;
@@ -48,11 +70,20 @@
         {name: "Updates"},
     ]
 
+    let settings = {
+        usePrerelease: false,
+        yourListCardSizeMultiplier: 1
+    }
+
+    /** @type {HTMLInputElement}*/
+    let CardSizeRangeElement;
+
     onMount(async () => {
         version = await GetVersion();
         releaseInfo = await GetReleaseInfo(true);
+        settings = await GetSettings();
 
-        console.log(releaseInfo);
+        CardSizeRangeElement.value = (settings.yourListCardSizeMultiplier * 100).toString();
 
         title.set(`Settings - General`);
     });
@@ -68,6 +99,11 @@
 
     function formateStringDate(date) {
         date = new Date(date);
+
+        if(isNaN(date.getDate())) {
+            return "Unknown";
+        }
+
         return `${date.getDate()}-${(date.getMonth() + 1)}-${date.getFullYear()}`
     }
 
@@ -76,11 +112,36 @@
 
         console.log(data);
     }
+
+    async function handleSaveSettings() {
+        const data = await SaveSettings(JSON.stringify(settings));
+
+        if(data !== "success") {
+            Toast.fire({
+                icon: "error",
+                title: "Failed to save settings",
+            });
+        }
+
+        Toast.fire({
+            icon: "success",
+            title: "Settings saved",
+        });
+    }
+
+    function handleSliderReset() {
+        CardSizeRangeElement.value = "100";
+        settings.yourListCardSizeMultiplier = 1;
+    }
+
+    function handleSliderChange(event) {
+        settings.yourListCardSizeMultiplier = event.target.value / 100;
+    }
 </script>
 
 <style lang="less">
 
-main {
+.updates_container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -143,6 +204,68 @@ main {
 
             &:hover {
                 background-color: var(--mal-blue-dark);
+            }
+        }
+    }
+}
+
+.settings {
+    padding-inline: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    h2 {
+        margin: 0;
+    }
+
+    button {
+        background-color: var(--mal-blue);
+        color: var(--text-white);
+        border: none;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+        margin-right: 10px;
+
+        &:hover {
+            background-color: var(--mal-blue-dark);
+        }
+    }
+
+    .slider {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        
+        // type range
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 20px;
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--text-light);
+            outline: none;
+            border-radius: 100px;
+            opacity: 0.7;
+            transition: opacity 0.2s ease-in-out;
+
+            &:hover {
+                opacity: 1;
+            }
+
+            &::-webkit-slider-thumb {
+                appearance: none;
+                width: 20px;
+                height: 20px;
+                background-color: var(--mal-blue);
+                border-radius: 100%;
+                cursor: pointer;
             }
         }
     }
