@@ -27,6 +27,7 @@ type Release struct {
 	PreRelease bool   `json:"prerelease"`
 	Published  string `json:"published_at"`
 	HtmlURL    string `json:"html_url"`
+	Message    string `json:"message"`
 }
 
 type ReleaseInfo struct {
@@ -57,6 +58,12 @@ func (a *App) startup(ctx context.Context) {
 	OAuthConfig.ClientID = GlobalConfig.MALClientID
 
 	runtime.EventsOn(ctx, "startup:success", func(data ...interface{}) {
+
+		err := LoadSettings()
+
+		if err != nil {
+			fmt.Println("Error loading settings:", err)
+		}
 
 		jsonString, err := LoadAppDataFile("token.enc")
 
@@ -217,4 +224,25 @@ func (a *App) InstallUpdate() string {
 	os.Exit(0)
 
 	return "success"
+}
+
+func (a *App) SaveSettings(settings string) string {
+
+	err := json.Unmarshal([]byte(settings), &Settings)
+
+	if err != nil {
+		return err.Error()
+	}
+
+	err = SaveSettings()
+
+	if err != nil {
+		return err.Error()
+	}
+
+	return "success"
+}
+
+func (a *App) GetSettings() AppSettings {
+	return Settings
 }

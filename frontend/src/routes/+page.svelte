@@ -186,6 +186,7 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
+        align-content: flex-start;
 
         margin-right: 3px;
         transform: translate3d(0,0,0);

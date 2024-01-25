@@ -2,30 +2,37 @@
 
 <main>
     {#if currentTab === "general" && releaseInfo !== undefined}
-        <h2>General</h2>
-        <p>Use Prerelease</p>
-        <input type="checkbox">
-    {:else if currentTab === "updates" && releaseInfo !== undefined}
-        <div class="updates">
-            
-            {#if releaseInfo.isLatest}
-                <h2>You are up to date</h2>
-                <p>Current version: {version}</p>
-                <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
-                <div class="buttons">
-                    <button on:click={() => BrowserOpenURL(releaseInfo.release.html_url)}>Release notes</button>
-                </div>
-            {:else}
-                <h2>Update available</h2>
-                <p>Current version: {version}</p>
-                <p>Latest version: {releaseInfo.release.tag_name}</p>
-                <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
-                <div class="buttons">
-                    <button on:click={() => BrowserOpenURL(releaseInfo.release.html_url)}>Release notes</button>
-                    <button on:click={handleDownload}>Download</button>
-                </div>
-            {/if}
+        <div class="settings">
+            <label for="use_prerelease">Use Pre-release</label>
+            <input type="checkbox" name="use_prerelease" bind:checked={settings.usePrerelease}>
 
+            <div class="buttons">
+                <button on:click={handleSaveSettings}>Save</button>
+            </div>
+        </div>
+    {:else if currentTab === "updates" && releaseInfo !== undefined}
+        <div class="updates_container">
+            <div class="updates">
+                
+                {#if releaseInfo.isLatest}
+                    <h2>You are up to date</h2>
+                    <p>Current version: {version}</p>
+                    <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
+                    <div class="buttons">
+                        <button on:click={() => BrowserOpenURL(releaseInfo.release.html_url)}>Release notes</button>
+                    </div>
+                {:else}
+                    <h2>Update available</h2>
+                    <p>Current version: {version}</p>
+                    <p>Latest version: {releaseInfo.release.tag_name}</p>
+                    <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
+                    <div class="buttons">
+                        <button on:click={() => BrowserOpenURL(releaseInfo.release.html_url)}>Release notes</button>
+                        <button on:click={handleDownload}>Download</button>
+                    </div>
+                {/if}
+
+            </div>
         </div>
     {:else}
         <h1>Loading...</h1>
@@ -33,11 +40,12 @@
 </main>
 
 <script>
-    import { GetVersion, GetReleaseInfo, InstallUpdate } from "$lib/wailsjs/go/main/App";
+    import { GetVersion, GetReleaseInfo, InstallUpdate, GetSettings, SaveSettings } from "$lib/wailsjs/go/main/App";
     import { onMount } from "svelte";
     import Tabs from "$lib/components/tabs.svelte";
     import { title } from "$lib/store";
     import { BrowserOpenURL } from "$lib/wailsjs/runtime/runtime";
+    import { Toast } from "$lib";
 
     let version;
     let releaseInfo = undefined;
@@ -48,9 +56,14 @@
         {name: "Updates"},
     ]
 
+    let settings = {
+        usePrerelease: false,
+    }
+
     onMount(async () => {
         version = await GetVersion();
         releaseInfo = await GetReleaseInfo(true);
+        settings = await GetSettings();
 
         console.log(releaseInfo);
 
@@ -68,6 +81,11 @@
 
     function formateStringDate(date) {
         date = new Date(date);
+
+        if(isNaN(date.getDate())) {
+            return "Unknown";
+        }
+
         return `${date.getDate()}-${(date.getMonth() + 1)}-${date.getFullYear()}`
     }
 
@@ -76,11 +94,27 @@
 
         console.log(data);
     }
+
+    async function handleSaveSettings() {
+        const data = await SaveSettings(JSON.stringify(settings));
+
+        if(data !== "success") {
+            Toast.fire({
+                icon: "error",
+                title: "Failed to save settings",
+            });
+        }
+
+        Toast.fire({
+            icon: "success",
+            title: "Settings saved",
+        });
+    }
 </script>
 
 <style lang="less">
 
-main {
+.updates_container {
     display: flex;
     flex-direction: column;
     align-items: center;
