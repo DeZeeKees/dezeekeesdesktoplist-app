@@ -92,6 +92,8 @@
         settings = await GetSettings()
         styleManager.set("your-list-card-size-multiplier", settings.yourListCardSizeMultiplier)
 
+        title.set("Your List - ")
+
         const MalUser = await GetRequest("https://api.myanimelist.net/v2/users/@me")
         .then(data => JSON.parse(data))
 
