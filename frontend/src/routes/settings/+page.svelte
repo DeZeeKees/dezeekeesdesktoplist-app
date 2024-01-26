@@ -6,8 +6,11 @@
             <h2>General</h2>
 
             <div class="row">
-                <label for="use_prerelease">Use Pre-release</label>
-                <input type="checkbox" name="use_prerelease" bind:checked={settings.usePrerelease}>
+                <p>Use Pre-release</p>
+                <label class="toggle-switch" for="use_prerelease" >
+                    <input type="checkbox" name="use_prerelease" id="use_prerelease" bind:checked={settings.usePrerelease}>
+                    <span class="toggle-button round"></span>
+                </label>
             </div>
             
             <h2>Your List</h2>
@@ -213,10 +216,11 @@
     padding-inline: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
 
-    h2 {
+    h2, p, label {
         margin: 0;
+        padding-bottom: 0.1rem;
     }
 
     button {
@@ -235,6 +239,11 @@
         &:hover {
             background-color: var(--mal-blue-dark);
         }
+    }
+
+    .row {
+        display: flex;
+        flex-direction: column;
     }
 
     .slider {
@@ -268,6 +277,66 @@
                 cursor: pointer;
             }
         }
+    }
+
+    /* The switch - the box around the slider */
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+        cursor: pointer;
+    }
+
+    /* Hide default HTML checkbox */
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* The toggle button */
+    .toggle-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        pointer-events: none;
+    }
+
+    .toggle-button:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+    }
+
+    input:checked + .toggle-button {
+        background-color: var(--mal-blue);
+    }
+
+    input:focus + .toggle-button {
+        box-shadow: 0 0 1px var(--mal-blue);
+    }
+
+    input:checked + .toggle-button:before {
+        transform: translateX(26px);
+    }
+
+    /* Rounded toggle button */
+    .toggle-button.round {
+        border-radius: 34px;
+    }
+
+    .toggle-button.round:before {
+        border-radius: 50%;
     }
 }
 
