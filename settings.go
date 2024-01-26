@@ -1,6 +1,9 @@
 package main
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type AppSettings struct {
 	UsePrerelease              bool    `json:"usePrerelease"`
@@ -11,7 +14,7 @@ var Settings AppSettings
 
 func LoadSettings() error {
 
-	data, err := LoadAppDataFile("settings.enc")
+	data, err := LoadAppDataFile("settings.json", false)
 
 	if err != nil {
 		return err
@@ -20,7 +23,16 @@ func LoadSettings() error {
 	err = json.Unmarshal([]byte(data), &Settings)
 
 	if err != nil {
-		return err
+		Settings = AppSettings{
+			UsePrerelease:              false,
+			YourListCardSizeMultiplier: 1,
+		}
+
+		err = SaveSettings()
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -33,7 +45,9 @@ func SaveSettings() error {
 		return err
 	}
 
-	err = SaveAppDataFile("settings.enc", string(data))
+	fmt.Println("Saving settings: " + string(data))
+
+	err = SaveAppDataFile("settings.json", string(data), false)
 
 	if err != nil {
 		return err

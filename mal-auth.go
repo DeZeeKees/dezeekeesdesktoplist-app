@@ -144,7 +144,7 @@ func HandleAuthCallback(codeString string) (*oauth2.Token, error) {
 	}
 
 	//save token to appdata
-	err = SaveAppDataFile("token.enc", string(jsonToken))
+	err = SaveAppDataFile("token.enc", string(jsonToken), true)
 
 	if err != nil {
 		fmt.Println("Error saving token:", err)
