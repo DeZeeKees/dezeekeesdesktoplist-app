@@ -62,10 +62,16 @@ func (a *App) startup(ctx context.Context) {
 		err := LoadSettings()
 
 		if err != nil {
-			fmt.Println("Error loading settings:", err)
+			runtime.MessageDialog(ctx, runtime.MessageDialogOptions{
+				Title:   "Error",
+				Message: "Error loading settings.\n\n" + err.Error() + "\n\nSettings will be reset.",
+				Type:    runtime.ErrorDialog,
+			})
+
+			os.Exit(1)
 		}
 
-		jsonString, err := LoadAppDataFile("token.enc")
+		jsonString, err := LoadAppDataFile("token.enc", true)
 
 		if err != nil {
 			fmt.Println("Error loading token:", err)

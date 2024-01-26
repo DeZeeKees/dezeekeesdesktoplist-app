@@ -42,12 +42,12 @@ func Encode(b []byte) string {
 	return base64.StdEncoding.EncodeToString(b)
 }
 
-func Decode(s string) []byte {
+func Decode(s string) ([]byte, error) {
 	data, err := base64.StdEncoding.DecodeString(s)
 	if err != nil {
-		panic(err)
+		return data, err
 	}
-	return data
+	return data, nil
 }
 
 func EncryptString(str string, EncryptSecret string) (string, error) {
@@ -67,14 +67,19 @@ func DecryptString(str string, EncryptSecret string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	cipherText := Decode(str)
+
+	cipherText, err := Decode(str)
+	if err != nil {
+		return "", err
+	}
+
 	cfb := cipher.NewCFBDecrypter(block, bytes)
 	plainText := make([]byte, len(cipherText))
 	cfb.XORKeyStream(plainText, cipherText)
 	return string(plainText), nil
 }
 
-func SaveAppDataFile(filename string, data string) error {
+func SaveAppDataFile(filename string, data string, encrypt bool) error {
 	filepath, err := GetAppDataFilePath(filename)
 
 	if err != nil {
@@ -82,12 +87,14 @@ func SaveAppDataFile(filename string, data string) error {
 		return err
 	}
 
-	//encrypt file
-	encrypted, err := EncryptString(data, EncryptSecret)
+	if encrypt {
+		//encrypt file
+		data, err = EncryptString(data, EncryptSecret)
 
-	if err != nil {
-		fmt.Println("Cannot encrypt file")
-		return err
+		if err != nil {
+			fmt.Println("Cannot encrypt file")
+			return err
+		}
 	}
 
 	//write file
@@ -110,7 +117,15 @@ func SaveAppDataFile(filename string, data string) error {
 
 	defer file.Close()
 
-	_, err = file.WriteString(encrypted)
+	//clear file
+	err = file.Truncate(0)
+
+	if err != nil {
+		fmt.Println("Cannot clear file")
+		return err
+	}
+
+	_, err = file.WriteString(data)
 
 	if err != nil {
 		fmt.Println("Cannot write to file")
@@ -120,7 +135,7 @@ func SaveAppDataFile(filename string, data string) error {
 	return nil
 }
 
-func LoadAppDataFile(filename string) (string, error) {
+func LoadAppDataFile(filename string, encrypt bool) (string, error) {
 
 	filepath, err := GetAppDataFilePath(filename)
 
@@ -128,6 +143,8 @@ func LoadAppDataFile(filename string) (string, error) {
 		fmt.Println("Cannot get filepath")
 		return "", err
 	}
+
+	fmt.Println("filepath - loadappdatafile: " + filepath)
 
 	//open file
 	_, err = os.Stat(filepath)
@@ -154,13 +171,17 @@ func LoadAppDataFile(filename string) (string, error) {
 		return "", err
 	}
 
-	//decrypt file
-	decrypted, err := DecryptString(string(buf[:n]), EncryptSecret)
+	fileData := string(buf[:n])
 
-	if err != nil {
-		fmt.Println("Cannot decrypt file")
-		return "", err
+	if encrypt {
+		//decrypt file
+		fileData, err = DecryptString(fileData, EncryptSecret)
+
+		if err != nil {
+			fmt.Println("Cannot decrypt file")
+			return "", err
+		}
 	}
 
-	return decrypted, nil
+	return fileData, nil
 }
