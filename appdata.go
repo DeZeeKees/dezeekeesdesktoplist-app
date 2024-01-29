@@ -144,8 +144,6 @@ func LoadAppDataFile(filename string, encrypt bool) (string, error) {
 		return "", err
 	}
 
-	fmt.Println("filepath - loadappdatafile: " + filepath)
-
 	//open file
 	_, err = os.Stat(filepath)
 

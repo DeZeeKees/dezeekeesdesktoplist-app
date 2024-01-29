@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type AppSettings struct {
@@ -35,6 +34,10 @@ func LoadSettings() error {
 		}
 	}
 
+	if Settings.YourListCardSizeMultiplier == 0 {
+		Settings.YourListCardSizeMultiplier = 1
+	}
+
 	return nil
 }
 
@@ -44,8 +47,6 @@ func SaveSettings() error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("Saving settings: " + string(data))
 
 	err = SaveAppDataFile("settings.json", string(data), false)
 
