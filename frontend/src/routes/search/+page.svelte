@@ -1,8 +1,8 @@
 <Tabs renderTabs={false}>
     <div class="search-container">
         <div class="search-bar">
-            <input type="search" name="anime_search" id="anime_search" placeholder="Search Anime" bind:this={searchInput} on:input={handleSearch}>
-            <button class="search-button">
+            <input type="search" name="anime_search" id="anime_search" placeholder="Search Anime" bind:this={searchInput} on:keyup={handleSearch}>
+            <button class="search-button" type="submit">
                 <span class="material-symbols-outlined">
                     search
                 </span>
@@ -13,11 +13,11 @@
 
 <main>
     {#if searchData === undefined}
-        <div>
+        <div class="center">
             <h1>Search for an anime</h1>
         </div>
-    {:else if searchData.data.length === 0}
-        <div>
+    {:else if searchItems.length === 0}
+        <div class="center">
             <h1>No results found</h1>
         </div>
     {:else}
@@ -39,24 +39,23 @@
     /** @type {HTMLInputElement} */
     let searchInput
 
+    const fields = "status,genres,media_type,mean,rank,num_episodes,rating,my_list_status"
+
     onMount(async () => {
         title.set(`Search`);
     })
 
-    let timeout = setTimeout(() => {}, 0);
+    async function handleSearch(event) {
+        let searchValue = searchInput.value.replace(/\s/g, "");
 
-    async function handleSearch() {
-        clearTimeout(timeout);
-        timeout = setTimeout(async () => {
-            if (searchInput.value.length > 2) {
-                searchData = await GetRequest("https://api.myanimelist.net/v2/anime?limit=10&q=" + searchInput.value)
-                    .then(data => JSON.parse(data));
+        // if both are false pass the if statement
+        if (event.key !== "Enter" || searchValue.length < 3) {
+            return;
+        }
 
-                searchItems = searchData.data;
-            } else {
-                searchData = undefined;
-            }
-        }, 500);
+        searchData = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue).then(data => JSON.parse(data));
+        
+        searchItems = searchData.data;
     }
 </script>
 
@@ -130,6 +129,12 @@
         
         margin-right: 3px;
         transform: translate3d(0,0,0);
+    }
+
+    .center {
+        width: 100%;
+        display: flex;
+        justify-content: center;
     }
 
 </style>
