@@ -19,6 +19,8 @@ var Version string
 
 var CurrentReleaseInfo ReleaseInfo
 
+var CurrentUser User
+
 func main() {
 
 	err := error(nil)

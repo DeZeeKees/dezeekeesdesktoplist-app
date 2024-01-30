@@ -59,7 +59,7 @@
 
     import { title, popover, ListItems, animeCurrentTab } from "$lib/store";
     import { onMount } from "svelte";
-    import { GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
+    import { GetCurrentUser, GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
     import Tabs from "$lib/components/tabs.svelte";
     import YourListItem from "$lib/components/YourListItem.svelte";
     import * as styleManager from "$lib/styleManager";
@@ -92,10 +92,7 @@
         settings = await GetSettings()
         styleManager.set("your-list-card-size-multiplier", settings.yourListCardSizeMultiplier)
 
-        title.set("Your List - ")
-
-        const MalUser = await GetRequest("https://api.myanimelist.net/v2/users/@me")
-        .then(data => JSON.parse(data))
+        const MalUser = await GetCurrentUser()
 
         title.set("Your List - " + MalUser.name)
 

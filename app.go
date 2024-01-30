@@ -4,10 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
-	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"golang.org/x/oauth2"
@@ -33,6 +30,35 @@ type Release struct {
 type ReleaseInfo struct {
 	IsLatest bool    `json:"isLatest"`
 	Release  Release `json:"release"`
+}
+
+type User struct {
+	ID              int    `json:"id"`
+	Name            string `json:"name"`
+	Picture         string `json:"picture"`
+	Gender          string `json:"gender"`
+	Birthday        string `json:"birthday"`
+	Location        string `json:"location"`
+	JoinedAt        string `json:"joined_at"`
+	AnimeStatistics struct {
+		NumItemsWatching    int     `json:"num_items_watching"`
+		NumItemsCompleted   int     `json:"num_items_completed"`
+		NumItemsOnHold      int     `json:"num_items_on_hold"`
+		NumItemsDropped     int     `json:"num_items_dropped"`
+		NumItemsPlanToWatch int     `json:"num_items_plan_to_watch"`
+		NumItems            int     `json:"num_items"`
+		NumDaysWatched      float64 `json:"num_days_watched"`
+		NumDaysWatching     float64 `json:"num_days_watching"`
+		NumDaysCompleted    float64 `json:"num_days_completed"`
+		NumDaysOnHold       float64 `json:"num_days_on_hold"`
+		NumDaysDropped      float64 `json:"num_days_dropped"`
+		NumDays             float64 `json:"num_days"`
+		NumEpisodes         int     `json:"num_episodes"`
+		NumTimesRewatched   int     `json:"num_times_rewatched"`
+		MeanScore           float64 `json:"mean_score"`
+	} `json:"anime_statistics"`
+	TimeZone    string `json:"time_zone"`
+	IsSupporter bool   `json:"is_supporter"`
 }
 
 // NewApp creates a new App application struct
@@ -95,6 +121,12 @@ func (a *App) startup(ctx context.Context) {
 		if err != nil {
 			fmt.Println("Error setting release info:", err)
 		}
+
+		err = fetchUser()
+
+		if err != nil {
+			fmt.Println("Error fetching user:", err)
+		}
 	})
 }
 
@@ -128,81 +160,23 @@ func (a *App) StartAuthProcess() error {
 }
 
 func (a *App) GetRequest(url string) string {
-
-	if AccessToken == nil || !AccessToken.Valid() {
-		return "[]"
-	}
-
-	fullBearer := "Bearer " + AccessToken.AccessToken
-
-	req, err := http.NewRequest("GET", url, nil)
+	bytes, err := GetRequest(url)
 
 	if err != nil {
-		fmt.Println("Error creating request:", err)
 		return "error"
 	}
 
-	req.Header.Add("Authorization", fullBearer)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-
-	if err != nil {
-		fmt.Println("Error getting request:", err)
-		return "error"
-	}
-
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return "error"
-	}
-
-	return string(body)
+	return string(bytes)
 }
 
 func (a *App) PatchRequest(url string, json string) string {
-
-	fullBearer := "Bearer " + AccessToken.AccessToken
-
-	formData, err := jsonToFormData(json)
+	bytes, err := PatchRequest(url, json)
 
 	if err != nil {
-		fmt.Println("Error converting json to form data:", err)
 		return "error"
 	}
 
-	req, err := http.NewRequest("PATCH", url, strings.NewReader(formData.Encode()))
-
-	if err != nil {
-		fmt.Println("Error creating request:", err)
-		return "error"
-	}
-
-	req.Header.Add("Authorization", fullBearer)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-
-	if err != nil {
-		fmt.Println("Error getting request:", err)
-		return "error"
-	}
-
-	defer resp.Body.Close()
-
-	bodyBytes, err := io.ReadAll(resp.Body)
-
-	if err != nil {
-		fmt.Println("Error reading response body:", err)
-		return "error"
-	}
-
-	return string(bodyBytes)
+	return string(bytes)
 }
 
 func (a *App) GetVersion() string {
@@ -251,4 +225,18 @@ func (a *App) SaveSettings(settings string) string {
 
 func (a *App) GetSettings() AppSettings {
 	return Settings
+}
+
+func (a *App) GetCurrentUser() User {
+	return CurrentUser
+}
+
+func (a *App) RefreshCurrentUser() string {
+	err := fetchUser()
+
+	if err != nil {
+		return "error"
+	}
+
+	return "success"
 }
