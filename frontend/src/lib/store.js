@@ -1,5 +1,6 @@
 import { writable } from "svelte/store";
-import { PatchRequest } from "./wailsjs/go/main/App";
+import { PatchRequest, DeleteRequest } from "./wailsjs/go/main/App";
+import Swal from "sweetalert2";
 
 export let title = writable("");
 export let animeCurrentTab = writable("watching");
@@ -59,6 +60,41 @@ export let popover = writable({
         })
 
         this.close()
+    },
+    delete: async function() {
+        const url = `https://api.myanimelist.net/v2/anime/${this.animeId}/my_list_status`
+
+        this.close()
+
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",  
+        }).then((result) => {
+            return result.isConfirmed
+        })
+
+        if(!result) {
+            return
+        }
+
+        const response = await DeleteRequest(url)
+
+        if(!response.success) {
+            console.log("error")
+            return
+        }
+
+        ListItems.update((list) => {
+            list = list.filter((item) => {
+                return item.node.id !== this.animeId
+            })
+
+            return list
+        })
     },
     close: function () {
         this.element.classList.add("inactive")

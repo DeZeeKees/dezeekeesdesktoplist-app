@@ -191,6 +191,22 @@ func (a *App) PatchRequest(url string, json string) Response {
 	}
 }
 
+func (a *App) DeleteRequest(url string) Response {
+	bytes, err := DeleteRequest(url)
+
+	if err != nil {
+		return Response{
+			Success: false,
+			Data:    err.Error(),
+		}
+	}
+
+	return Response{
+		Success: true,
+		Data:    string(bytes),
+	}
+}
+
 func (a *App) GetVersion() string {
 	return Version
 }

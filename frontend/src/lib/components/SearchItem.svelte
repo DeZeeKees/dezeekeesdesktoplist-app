@@ -226,6 +226,10 @@
                     cursor: pointer;
                     transition: all 0.2s ease-in-out;
 
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+
                     &:hover {
                         background-color: var(--mal-blue-dark);
                     }
@@ -270,5 +274,4 @@
             }
         }
     }
-
 </style>

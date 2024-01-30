@@ -49,6 +49,7 @@
         
         <div class="buttons">
             <button on:mouseup={() => { $popover.element.classList.add("inactive") }}>Close</button>
+            <button on:click={$popover.delete()}>Delete</button>
             <button class="" on:click={$popover.save()}>Save</button>
         </div>
     </div>
@@ -63,7 +64,6 @@
     import Tabs from "$lib/components/tabs.svelte";
     import YourListItem from "$lib/components/YourListItem.svelte";
     import * as styleManager from "$lib/styleManager";
-    import { json } from "@sveltejs/kit";
 
     const tabList = [
         {name: "Watching"},
@@ -269,7 +269,7 @@
                 display: flex;
                 justify-content: end;
                 padding-top: 1rem;
-                gap: 1rem;
+                gap: 0.5rem;
 
                 button {
                     padding: 0.5rem 1rem;
