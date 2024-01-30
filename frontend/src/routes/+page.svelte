@@ -49,6 +49,7 @@
         
         <div class="buttons">
             <button on:mouseup={() => { $popover.element.classList.add("inactive") }}>Close</button>
+            <button on:click={$popover.delete()}>Delete</button>
             <button class="" on:click={$popover.save()}>Save</button>
         </div>
     </div>
@@ -59,7 +60,7 @@
 
     import { title, popover, ListItems, animeCurrentTab } from "$lib/store";
     import { onMount } from "svelte";
-    import { GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
+    import { GetCurrentUser, GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
     import Tabs from "$lib/components/tabs.svelte";
     import YourListItem from "$lib/components/YourListItem.svelte";
     import * as styleManager from "$lib/styleManager";
@@ -92,10 +93,7 @@
         settings = await GetSettings()
         styleManager.set("your-list-card-size-multiplier", settings.yourListCardSizeMultiplier)
 
-        title.set("Your List - ")
-
-        const MalUser = await GetRequest("https://api.myanimelist.net/v2/users/@me")
-        .then(data => JSON.parse(data))
+        const MalUser = await GetCurrentUser()
 
         title.set("Your List - " + MalUser.name)
 
@@ -152,13 +150,17 @@
     }
 
     async function GetStuff(url) {
-        return await GetRequest(url).then((data) => {
-            if(data === "error") {
-                return
-            }
+        const response = await GetRequest(url)
 
-            return JSON.parse(data)
-        })
+        if(!response.success) {
+            Toast.fire({
+                icon: "error",
+                title: response.data,
+            });
+            return
+        }
+
+        return JSON.parse(response.data)
     }
 
     var throttleTimer;
@@ -267,7 +269,7 @@
                 display: flex;
                 justify-content: end;
                 padding-top: 1rem;
-                gap: 1rem;
+                gap: 0.5rem;
 
                 button {
                     padding: 0.5rem 1rem;

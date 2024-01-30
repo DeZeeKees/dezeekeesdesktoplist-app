@@ -10,6 +10,11 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
+type Response struct {
+	Success bool `json:"success"`
+	Data    any  `json:"data"`
+}
+
 //go:embed all:frontend/build
 var assets embed.FS
 
@@ -18,6 +23,8 @@ var GlobalConfig AppConfig
 var Version string
 
 var CurrentReleaseInfo ReleaseInfo
+
+var CurrentUser User
 
 func main() {
 

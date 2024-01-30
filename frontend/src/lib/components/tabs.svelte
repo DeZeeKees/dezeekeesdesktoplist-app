@@ -6,8 +6,9 @@
 
             <div class="top">
                 <a href="/" class={$page.url.pathname === '/' ? 'active' : ''}>Your List</a>
-                <a href="/seasonal" class={$page.url.pathname === '/seasonal' ? 'active' : ''}>Seasonal</a>
-                <a href="/ranking" class={$page.url.pathname === '/ranking' ? 'active' : ''}>Ranking</a>
+                <a href="/search" class={$page.url.pathname === '/search' ? 'active' : ''}>Search</a>
+                <a href="#temp" class={$page.url.pathname === '/seasonal' ? 'active' : ''}>Seasonal</a>
+                <a href="#temp" class={$page.url.pathname === '/ranking' ? 'active' : ''}>Ranking</a>
             </div>
 
             <div class="bottom">
@@ -17,11 +18,17 @@
         </div>
     </button>
     
-    <div class="tabs" bind:this={tabList}>
-        {#each tabs as tab, i}
-                <button class={"tab" + (i === 0 ? " active" : "")} on:click={changeTab}>{tab.name}</button>
-        {/each}
-    </div>
+    {#if renderTabs}
+        <div class="tabs" bind:this={tabList}>
+            {#each tabs as tab, i}
+                    <button class={"tab" + (i === 0 ? " active" : "")} on:click={changeTab}>{tab.name}</button>
+            {/each}
+        </div>
+    {:else}
+        <div class="notabs">
+            <slot />
+        </div>
+    {/if}
 
 </nav>
 
@@ -29,6 +36,7 @@
     import { page } from "$app/stores";
     import { createEventDispatcher } from "svelte";
     export let tabs = [];
+    export let renderTabs = true;
 
     let tabList
     const dispatch = createEventDispatcher()
@@ -73,7 +81,7 @@
             .menu {
                 position: absolute;
                 top: 0;
-                left: -10rem;
+                left: -12rem;
                 width: 10rem;
                 height: calc(100vh - var(--titlebar-height));
                 box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
@@ -156,6 +164,10 @@
             button.tab.active, button.tab:hover {
                 background: color-mix(in srgb, black 30%, var(--mal-blue));
             }
+        }
+
+        .notabs {
+            width: calc(100% - 4rem);
         }
     }
 
