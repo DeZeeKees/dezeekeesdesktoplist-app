@@ -33,6 +33,7 @@
     import { title } from "$lib/store";
     import { GetRequest } from "$lib/wailsjs/go/main/App";
     import { onMount } from "svelte";
+    import { Toast } from "$lib";
 
     let searchData = undefined;
     let searchItems = [];
@@ -53,7 +54,17 @@
             return;
         }
 
-        searchData = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue).then(data => JSON.parse(data));
+        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue)
+
+        if(!response.success) {
+            Toast.fire({
+                icon: "error",
+                title: "Something went wrong"
+            })
+            return
+        }
+
+        searchData = JSON.parse(response.data);
         
         searchItems = searchData.data;
     }

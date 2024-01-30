@@ -84,16 +84,19 @@
             formData.status = "completed"
         }
 
-        const response = await PatchRequest(url, JSON.stringify(formData)).then((data) => {
-            if(data === "error") {
-                console.log("error")
-                return
-            }
+        const response = await PatchRequest(url, JSON.stringify(formData))
 
-            return JSON.parse(data)
-        })
+        if(!response.success) {
+            Toast.fire({
+                icon: 'error',
+                title: 'Something went wrong!',
+            })
+            return
+        }
 
-        if(response.status == "completed") {
+        const responseData = JSON.parse(response.data)
+
+        if(responseData.status == "completed") {
             Toast.fire({
                 icon: 'success',
                 title: 'Anime completed!',
@@ -102,7 +105,7 @@
             })
         }
 
-        data.list_status.num_episodes_watched = response.num_episodes_watched
+        data.list_status.num_episodes_watched = responseData.num_episodes_watched
     }
 
     /**

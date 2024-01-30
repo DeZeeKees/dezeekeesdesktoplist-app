@@ -27,16 +27,9 @@ export let popover = writable({
             num_times_rewatched: this.timesRewatched
         }
 
-        const response = await PatchRequest(url, JSON.stringify(formData)).then((data) => {
-            if(data === "error") {
-                console.log("error")
-                return
-            }
+        const response = await PatchRequest(url, JSON.stringify(formData))
 
-            return JSON.parse(data)
-        })
-
-        if(response === undefined || response === "error") {
+        if(!response.success) {
             console.log("error")
             return
         }

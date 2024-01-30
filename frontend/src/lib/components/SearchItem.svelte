@@ -103,19 +103,15 @@
         }
         const url = `https://api.myanimelist.net/v2/anime/${id}/my_list_status`
 
-        const result = await PatchRequest(url, JSON.stringify(postData)).then((data) => {
-            if(data === "error") {
-                Toast.fire({
-                    icon: "error",
-                    title: "Error updating list"
-                })
-                return null
-            }
+        const response = await PatchRequest(url, JSON.stringify(postData))
 
-            return JSON.parse(data)
-        })
-
-        if(result === null) return
+        if(!response.data) {
+            Toast.fire({
+                icon: "error",
+                title: "Error updating list"
+            })
+            return
+        }
 
         Toast.fire({
             icon: "success",
@@ -130,19 +126,15 @@
         }
         const url = `https://api.myanimelist.net/v2/anime/${id}/my_list_status`
 
-        const result = await PatchRequest(url, JSON.stringify(postData)).then((data) => {
-            if(data === "error") {
-                Toast.fire({
-                    icon: "error",
-                    title: "Error adding to list"
-                })
-                return null
-            }
+        const response = await PatchRequest(url, JSON.stringify(postData))
 
-            return JSON.parse(data)
-        })
-
-        if(result === null) return
+        if(!response.success) {
+            Toast.fire({
+                icon: "error",
+                title: "Error adding to list"
+            })
+            return
+        }
 
         Toast.fire({
             icon: "success",

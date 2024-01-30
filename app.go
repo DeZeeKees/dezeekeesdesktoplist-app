@@ -159,24 +159,36 @@ func (a *App) StartAuthProcess() error {
 	return nil
 }
 
-func (a *App) GetRequest(url string) string {
+func (a *App) GetRequest(url string) Response {
 	bytes, err := GetRequest(url)
 
 	if err != nil {
-		return "error"
+		return Response{
+			Success: false,
+			Data:    err.Error(),
+		}
 	}
 
-	return string(bytes)
+	return Response{
+		Success: true,
+		Data:    string(bytes),
+	}
 }
 
-func (a *App) PatchRequest(url string, json string) string {
+func (a *App) PatchRequest(url string, json string) Response {
 	bytes, err := PatchRequest(url, json)
 
 	if err != nil {
-		return "error"
+		return Response{
+			Success: false,
+			Data:    err.Error(),
+		}
 	}
 
-	return string(bytes)
+	return Response{
+		Success: true,
+		Data:    string(bytes),
+	}
 }
 
 func (a *App) GetVersion() string {
@@ -249,12 +261,18 @@ func (a *App) GetCurrentUser() User {
 	return CurrentUser
 }
 
-func (a *App) RefreshCurrentUser() string {
+func (a *App) RefreshCurrentUser() Response {
 	err := fetchUser()
 
 	if err != nil {
-		return "error"
+		return Response{
+			Success: false,
+			Data:    err.Error(),
+		}
 	}
 
-	return "success"
+	return Response{
+		Success: true,
+		Data:    "success",
+	}
 }

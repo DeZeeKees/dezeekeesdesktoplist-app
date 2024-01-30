@@ -63,6 +63,7 @@
     import Tabs from "$lib/components/tabs.svelte";
     import YourListItem from "$lib/components/YourListItem.svelte";
     import * as styleManager from "$lib/styleManager";
+    import { json } from "@sveltejs/kit";
 
     const tabList = [
         {name: "Watching"},
@@ -149,13 +150,17 @@
     }
 
     async function GetStuff(url) {
-        return await GetRequest(url).then((data) => {
-            if(data === "error") {
-                return
-            }
+        const response = await GetRequest(url)
 
-            return JSON.parse(data)
-        })
+        if(!response.success) {
+            Toast.fire({
+                icon: "error",
+                title: response.data,
+            });
+            return
+        }
+
+        return JSON.parse(response.data)
     }
 
     var throttleTimer;
