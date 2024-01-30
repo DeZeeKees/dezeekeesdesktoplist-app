@@ -12,12 +12,12 @@ export function GetSettings():Promise<main.AppSettings>;
 
 export function GetVersion():Promise<string>;
 
-export function InstallUpdate():Promise<string>;
+export function InstallUpdate():Promise<main.Response>;
 
 export function PatchRequest(arg1:string,arg2:string):Promise<string>;
 
 export function RefreshCurrentUser():Promise<string>;
 
-export function SaveSettings(arg1:string):Promise<string>;
+export function SaveSettings(arg1:string):Promise<main.Response>;
 
 export function StartAuthProcess():Promise<void>;

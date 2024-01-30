@@ -33,7 +33,7 @@
                 </label>
             </div>
             {/if}
-            <button class="secondary">View Anime</button>
+            <a href="#none">View Anime</a>
         </div>
     </div>
 

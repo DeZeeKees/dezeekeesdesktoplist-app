@@ -111,15 +111,20 @@
     }
 
     async function handleDownload() {
-        const data = await InstallUpdate();
+        const response = await InstallUpdate();
 
-        console.log(data);
+        if(!response.success) {
+            Toast.fire({
+                icon: "error",
+                title: response.data,
+            });
+        }
     }
 
     async function handleSaveSettings() {
-        const data = await SaveSettings(JSON.stringify(settings));
+        const response = await SaveSettings(JSON.stringify(settings));
 
-        if(data !== "success") {
+        if(!response.success) {
             Toast.fire({
                 icon: "error",
                 title: "Failed to save settings",
@@ -130,6 +135,8 @@
             icon: "success",
             title: "Settings saved",
         });
+
+        console.log(response.data);
     }
 
     function handleSliderReset() {

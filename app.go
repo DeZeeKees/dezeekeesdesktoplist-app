@@ -187,40 +187,58 @@ func (a *App) GetReleaseInfo(prerelease bool) ReleaseInfo {
 	return CurrentReleaseInfo
 }
 
-func (a *App) InstallUpdate() string {
+func (a *App) InstallUpdate() Response {
 
 	err := DownloadInstaller()
 
 	if err != nil {
-		return err.Error()
+		return Response{
+			Success: false,
+			Data:    err.Error(),
+		}
 	}
 
 	err = RunInstaller()
 
 	if err != nil {
-		return err.Error()
+		return Response{
+			Success: false,
+			Data:    err.Error(),
+		}
 	}
 
 	os.Exit(0)
 
-	return "success"
+	return Response{
+		Success: true,
+		Data:    "success",
+	}
 }
 
-func (a *App) SaveSettings(settings string) string {
+func (a *App) SaveSettings(settings string) Response {
 
 	err := json.Unmarshal([]byte(settings), &Settings)
 
 	if err != nil {
-		return err.Error()
+		return Response{
+			Success: false,
+			Data:    err.Error(),
+		}
 	}
 
 	err = SaveSettings()
 
 	if err != nil {
-		return err.Error()
+		return Response{
+			Success: false,
+			Data:    err.Error(),
+		}
 	}
 
-	return "success"
+	return Response{
+		Success: true,
+		Data:    "success",
+	}
 }
 
 func (a *App) GetSettings() AppSettings {
