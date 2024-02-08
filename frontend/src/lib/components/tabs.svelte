@@ -7,8 +7,9 @@
             <div class="top">
                 <a href="/" class={$page.url.pathname === '/' ? 'active' : ''}>Your List</a>
                 <a href="/search" class={$page.url.pathname === '/search' ? 'active' : ''}>Search</a>
-                <a href="#temp" class={$page.url.pathname === '/seasonal' ? 'active' : ''}>Seasonal</a>
-                <a href="#temp" class={$page.url.pathname === '/ranking' ? 'active' : ''}>Ranking</a>
+                <!-- @todo implement these pages -->
+                <!-- <a href="#temp" class={$page.url.pathname === '/seasonal' ? 'active' : ''}>Seasonal</a>
+                <a href="#temp" class={$page.url.pathname === '/ranking' ? 'active' : ''}>Ranking</a> -->
             </div>
 
             <div class="bottom">
