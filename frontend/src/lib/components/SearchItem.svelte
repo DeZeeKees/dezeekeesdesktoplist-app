@@ -63,6 +63,8 @@
     function formatGenres(genres) {
         let genresString = ""
 
+        if(genres === undefined || genres === null) return "<span class='chip'>N/A</span>";
+
         genres.map(genre => {
             genresString += "<span class='chip'>" + genre.name + "</span>";
         })
