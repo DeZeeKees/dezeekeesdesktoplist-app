@@ -127,6 +127,7 @@ func (a *App) startup(ctx context.Context) {
 		if err != nil {
 			fmt.Println("Error fetching user:", err)
 		}
+
 	})
 }
 

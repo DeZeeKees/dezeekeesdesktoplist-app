@@ -64,6 +64,7 @@
     import Tabs from "$lib/components/tabs.svelte";
     import YourListItem from "$lib/components/YourListItem.svelte";
     import * as styleManager from "$lib/styleManager";
+    import { Toast } from "$lib";
 
     const tabList = [
         {name: "Watching"},
