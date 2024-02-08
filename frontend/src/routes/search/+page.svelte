@@ -2,7 +2,7 @@
     <div class="search-container">
         <div class="search-bar">
             <input type="search" name="anime_search" id="anime_search" placeholder="Search Anime" bind:this={searchInput} on:keyup={handleSearch}>
-            <button class="search-button" type="submit">
+            <button class="search-button" on:click={handleSearchClick}>
                 <span class="material-symbols-outlined">
                     search
                 </span>
@@ -59,6 +59,28 @@
 
         // if both are false pass the if statement
         if (event.key !== "Enter" || searchValue.length < 3) {
+            return;
+        }
+
+        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue + "&nsfw=" + settings.nsfwContent)
+
+        if(!response.success) {
+            Toast.fire({
+                icon: "error",
+                title: "Something went wrong"
+            })
+            return
+        }
+
+        searchData = JSON.parse(response.data);
+        
+        searchItems = searchData.data;
+    }
+
+    async function handleSearchClick() {
+        let searchValue = searchInput.value.replace(/\s/g, "");
+
+        if(searchValue.length < 3) {
             return;
         }
 
