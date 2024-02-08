@@ -31,7 +31,7 @@
     import Tabs from "$lib/components/tabs.svelte";
     import SearchItem from "$lib/components/SearchItem.svelte";
     import { title } from "$lib/store";
-    import { GetRequest } from "$lib/wailsjs/go/main/App";
+    import { GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
     import { onMount } from "svelte";
     import { Toast } from "$lib";
 
@@ -42,8 +42,16 @@
 
     const fields = "status,genres,media_type,mean,rank,num_episodes,rating,my_list_status"
 
+    let settings = {
+        usePrerelease: false,
+        yourListCardSizeMultiplier: 1,
+        nsfwContent: false,
+    }
+
     onMount(async () => {
         title.set(`Search`);
+
+        settings = await GetSettings()
     })
 
     async function handleSearch(event) {
@@ -54,7 +62,7 @@
             return;
         }
 
-        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue)
+        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue + "&nsfw=" + settings.nsfwContent)
 
         if(!response.success) {
             Toast.fire({

@@ -7,6 +7,7 @@ import (
 type AppSettings struct {
 	UsePrerelease              bool    `json:"usePrerelease"`
 	YourListCardSizeMultiplier float64 `json:"yourListCardSizeMultiplier"`
+	NSFWContent                bool    `json:"nsfwContent"`
 }
 
 var Settings AppSettings
@@ -25,6 +26,7 @@ func LoadSettings() error {
 		Settings = AppSettings{
 			UsePrerelease:              false,
 			YourListCardSizeMultiplier: 1,
+			NSFWContent:                false,
 		}
 
 		err = SaveSettings()

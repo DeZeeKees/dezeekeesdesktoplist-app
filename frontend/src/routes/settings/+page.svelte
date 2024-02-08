@@ -12,6 +12,14 @@
                     <span class="toggle-button round"></span>
                 </label>
             </div>
+
+            <div class="row">
+                <p>NSFW Content</p>
+                <label class="toggle-switch" for="nsfw_content" >
+                    <input type="checkbox" name="nsfw_content" id="nsfw_content" bind:checked={settings.nsfwContent}>
+                    <span class="toggle-button round"></span>
+                </label>
+            </div>
             
             <h2>Your List</h2>
             
@@ -75,7 +83,8 @@
 
     let settings = {
         usePrerelease: false,
-        yourListCardSizeMultiplier: 1
+        yourListCardSizeMultiplier: 1,
+        nsfwContent: false
     }
 
     /** @type {HTMLInputElement}*/
