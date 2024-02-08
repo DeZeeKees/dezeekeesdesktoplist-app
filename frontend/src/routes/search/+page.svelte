@@ -2,7 +2,7 @@
     <div class="search-container">
         <div class="search-bar">
             <input type="search" name="anime_search" id="anime_search" placeholder="Search Anime" bind:this={searchInput} on:keyup={handleSearch}>
-            <button class="search-button" type="submit">
+            <button class="search-button" on:click={handleSearchClick}>
                 <span class="material-symbols-outlined">
                     search
                 </span>
@@ -31,7 +31,7 @@
     import Tabs from "$lib/components/tabs.svelte";
     import SearchItem from "$lib/components/SearchItem.svelte";
     import { title } from "$lib/store";
-    import { GetRequest } from "$lib/wailsjs/go/main/App";
+    import { GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
     import { onMount } from "svelte";
     import { Toast } from "$lib";
 
@@ -42,8 +42,16 @@
 
     const fields = "status,genres,media_type,mean,rank,num_episodes,rating,my_list_status"
 
+    let settings = {
+        usePrerelease: false,
+        yourListCardSizeMultiplier: 1,
+        nsfwContent: false,
+    }
+
     onMount(async () => {
         title.set(`Search`);
+
+        settings = await GetSettings()
     })
 
     async function handleSearch(event) {
@@ -54,7 +62,29 @@
             return;
         }
 
-        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue)
+        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue + "&nsfw=" + settings.nsfwContent)
+
+        if(!response.success) {
+            Toast.fire({
+                icon: "error",
+                title: "Something went wrong"
+            })
+            return
+        }
+
+        searchData = JSON.parse(response.data);
+        
+        searchItems = searchData.data;
+    }
+
+    async function handleSearchClick() {
+        let searchValue = searchInput.value.replace(/\s/g, "");
+
+        if(searchValue.length < 3) {
+            return;
+        }
+
+        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue + "&nsfw=" + settings.nsfwContent)
 
         if(!response.success) {
             Toast.fire({

@@ -5,7 +5,7 @@
     </div>
 
     <div class="right">
-        <h2>#{data.node.rank} {data.node.title}</h2>
+        <h2>#{formatRank(data.node.rank)} {data.node.title}</h2>
         <div>{@html formatGenres(data.node.genres)}</div>
         <p>
             {@html capitalize(data.node.media_type)} -
@@ -63,6 +63,8 @@
     function formatGenres(genres) {
         let genresString = ""
 
+        if(genres === undefined || genres === null) return "<span class='chip'>N/A</span>";
+
         genres.map(genre => {
             genresString += "<span class='chip'>" + genre.name + "</span>";
         })
@@ -94,6 +96,11 @@
             default:
                 return "N/A";
         }
+    }
+
+    function formatRank(rank) {
+        if(rank === null || rank === undefined) return "N/A";
+        return rank;
     }
 
     async function handleSelectChange(event) {

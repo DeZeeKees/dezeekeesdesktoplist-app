@@ -59,11 +59,14 @@
     // @ts-nocheck
 
     import { title, popover, ListItems, animeCurrentTab } from "$lib/store";
-    import { onMount } from "svelte";
     import { GetCurrentUser, GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
     import Tabs from "$lib/components/tabs.svelte";
     import YourListItem from "$lib/components/YourListItem.svelte";
     import * as styleManager from "$lib/styleManager";
+    import { Toast } from "$lib";
+    import { EventsOn } from "$lib/wailsjs/runtime/runtime";
+    import { onMount } from "svelte";
+    import { afterNavigate } from "$app/navigation";
 
     const tabList = [
         {name: "Watching"},
@@ -79,26 +82,43 @@
 
     let canRefresh = true
 
+    let settings = {
+        usePrerelease: false,
+        yourListCardSizeMultiplier: 1,
+        nsfwContent: false,
+    }
+
     const fields = "list_status{num_times_rewatched},num_episodes,media_type,start_date,end_date"
     const fetchInterval = 30
 
-    const baseUrl = "https://api.myanimelist.net/v2/users/@me/animelist?limit=" + fetchInterval + "&fields=" + fields
-
-    let settings = {
-        usePrerelease: false,
-        yourListCardSizeMultiplier: 1
-    }
+    let baseUrl = "https://api.myanimelist.net/v2/users/@me/animelist?limit=" + fetchInterval + "&fields=" + fields
 
     onMount(async () => {
+        EventsOn("startup:complete", async () => {
+            settings = await GetSettings()
+            styleManager.set("your-list-card-size-multiplier", settings.yourListCardSizeMultiplier)
+
+            baseUrl += "&nsfw=" + settings.nsfwContent
+
+            const MalUser = await GetCurrentUser()
+
+            title.set("Your List - " + MalUser.name)
+
+            ListResponse = await GetStuff(baseUrl + "&status=watching")
+            $ListItems = ListResponse.data
+
+            console.log(settings.nsfwContent)
+        })
+    })
+
+    afterNavigate(async () => {
+        const MalUser = await GetCurrentUser()
+        title.set("Your List - " + MalUser.name)
+
         settings = await GetSettings()
         styleManager.set("your-list-card-size-multiplier", settings.yourListCardSizeMultiplier)
 
-        const MalUser = await GetCurrentUser()
-
-        title.set("Your List - " + MalUser.name)
-
-        ListResponse = await GetStuff(baseUrl + "&status=watching")
-        $ListItems = ListResponse.data
+        baseUrl += "&nsfw=" + settings.nsfwContent
     })
 
     /**
@@ -119,6 +139,8 @@
         ListResponse = await GetStuff(baseUrl + "&status=" + status)
         $ListItems = ListResponse.data
         canRefresh = true
+
+        console.log(baseUrl)
     }
 
     /**

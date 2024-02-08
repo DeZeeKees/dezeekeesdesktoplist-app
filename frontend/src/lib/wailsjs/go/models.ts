@@ -3,6 +3,7 @@ export namespace main {
 	export class AppSettings {
 	    usePrerelease: boolean;
 	    yourListCardSizeMultiplier: number;
+	    nsfwContent: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppSettings(source);
@@ -12,6 +13,7 @@ export namespace main {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.usePrerelease = source["usePrerelease"];
 	        this.yourListCardSizeMultiplier = source["yourListCardSizeMultiplier"];
+	        this.nsfwContent = source["nsfwContent"];
 	    }
 	}
 	export class  {
