@@ -31,10 +31,12 @@ DezeekeesDesktopList is built using Wails and SvelteKit. Follow the steps below 
 ## Prerequisites
 Make sure you have the following dependencies installed:
 
-- Go (https://golang.org/dl)
-- Node.js (https://nodejs.org)
-- Npm (https://www.npmjs.com)
-- Wails Cli (https://wails.io)
+- Go 1.21.6 (https://golang.org/dl)
+- Node.js >= 20.7.0 (https://nodejs.org)
+- Npm >= 10.4.0 (https://www.npmjs.com)
+- Wails Cli 2.7.1 (https://wails.io)
+
+not using the recommended go version might break the wails cli
 
 ## Live Development
 
