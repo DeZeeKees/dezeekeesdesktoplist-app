@@ -128,6 +128,7 @@ func (a *App) startup(ctx context.Context) {
 			fmt.Println("Error fetching user:", err)
 		}
 
+		runtime.EventsEmit(ctx, "startup:complete")
 	})
 }
 

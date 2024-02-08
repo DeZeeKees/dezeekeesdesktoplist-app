@@ -59,12 +59,14 @@
     // @ts-nocheck
 
     import { title, popover, ListItems, animeCurrentTab } from "$lib/store";
-    import { onMount } from "svelte";
     import { GetCurrentUser, GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
     import Tabs from "$lib/components/tabs.svelte";
     import YourListItem from "$lib/components/YourListItem.svelte";
     import * as styleManager from "$lib/styleManager";
     import { Toast } from "$lib";
+    import { EventsOn } from "$lib/wailsjs/runtime/runtime";
+    import { onMount } from "svelte";
+    import { afterNavigate } from "$app/navigation";
 
     const tabList = [
         {name: "Watching"},
@@ -91,15 +93,24 @@
     }
 
     onMount(async () => {
-        settings = await GetSettings()
-        styleManager.set("your-list-card-size-multiplier", settings.yourListCardSizeMultiplier)
+        EventsOn("startup:complete", async () => {
+            settings = await GetSettings()
+            styleManager.set("your-list-card-size-multiplier", settings.yourListCardSizeMultiplier)
 
+            const MalUser = await GetCurrentUser()
+
+            title.set("Your List - " + MalUser.name)
+
+            ListResponse = await GetStuff(baseUrl + "&status=watching")
+            $ListItems = ListResponse.data
+
+            console.log("i ran")
+        })
+    })
+
+    afterNavigate(async () => {
         const MalUser = await GetCurrentUser()
-
         title.set("Your List - " + MalUser.name)
-
-        ListResponse = await GetStuff(baseUrl + "&status=watching")
-        $ListItems = ListResponse.data
     })
 
     /**
