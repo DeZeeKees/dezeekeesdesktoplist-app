@@ -33,7 +33,7 @@
                 </label>
             </div>
             {/if}
-            <a href="#none">View Anime</a>
+            <a href={"/anime/" + data.node.id}>View Anime</a>
         </div>
     </div>
 
