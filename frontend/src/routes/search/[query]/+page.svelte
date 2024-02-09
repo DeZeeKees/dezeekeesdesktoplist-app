@@ -34,6 +34,8 @@
     import { GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
     import { onMount } from "svelte";
     import { Toast } from "$lib";
+    import { page } from "$app/stores";
+    import { afterNavigate, goto } from "$app/navigation";
 
     let searchData = undefined;
     let searchItems = [];
@@ -54,6 +56,28 @@
         settings = await GetSettings()
     })
 
+    afterNavigate(async () => {
+        if($page.params.query === "none") {
+            return;
+        }
+
+        searchInput.value = $page.params.query;
+
+        let response = await GetRequest(`https://api.myanimelist.net/v2/anime?q=${searchInput.value}&fields=${fields}&limit=50`)
+
+        if(!response.success) {
+            Toast.fire({
+                icon: "error",
+                title: "Could not find anime"
+            })
+            return
+        }
+
+        searchData = JSON.parse(response.data);
+
+        searchItems = searchData.data;
+    })
+
     async function handleSearch(event) {
         let searchValue = searchInput.value.replace(/\s/g, "");
 
@@ -62,19 +86,7 @@
             return;
         }
 
-        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue + "&nsfw=" + settings.nsfwContent)
-
-        if(!response.success) {
-            Toast.fire({
-                icon: "error",
-                title: "Something went wrong"
-            })
-            return
-        }
-
-        searchData = JSON.parse(response.data);
-        
-        searchItems = searchData.data;
+        goto(`/search/${searchValue}`)
     }
 
     async function handleSearchClick() {
@@ -84,19 +96,7 @@
             return;
         }
 
-        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue + "&nsfw=" + settings.nsfwContent)
-
-        if(!response.success) {
-            Toast.fire({
-                icon: "error",
-                title: "Something went wrong"
-            })
-            return
-        }
-
-        searchData = JSON.parse(response.data);
-        
-        searchItems = searchData.data;
+        goto(`/search/${searchValue}`)
     }
 </script>
 
