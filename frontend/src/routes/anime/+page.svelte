@@ -101,20 +101,44 @@
                             <button class="primary" on:click={handleAddToList} data-ani-id={animeData?.id}>Add to List</button>
                         {:else}
                             <div class="select-container">
-                                <select id={`sel-${animeData?.id}`} on:change={handleSelectChange} data-ani-id={animeData?.id}>
+                                <select id={`sel-status-${animeData?.id}`} on:change={handleStatusSelectChange} data-ani-id={animeData?.id}>
                                     {#each selectOptions as option (option)}
                                         <option value={option} selected={option === animeData?.my_list_status.status}>
                                             {capitalize(option)}
                                         </option>
                                     {/each}
                                 </select>
-                                <label for={`sel-${animeData?.id}`}>
+                                <label for={`sel-status-${animeData?.id}`}>
                                     <span class="material-symbols-outlined">
                                         arrow_drop_down
                                     </span>
                                 </label>
                             </div>
                         {/if}
+
+                        <div class="select-container">
+                            <select id={`sel-score-${animeData?.id}`} on:change={handleScoreSelectChange} data-ani-id={animeData?.id}>
+                                {#each selectScores as score}
+                                    <option value={score.value} selected={score.value === animeData?.my_list_status?.score}>
+                                        {score.text}
+                                    </option>
+                                {/each}
+                            </select>
+                            <label for={`sel-score-${animeData?.id}`}>
+                                <span class="material-symbols-outlined">
+                                    arrow_drop_down
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="episodes">
+                            <p>Episodes: </p>
+                            <input type="number" on:focusout={handleEpisodesInputFocus} value={animeData.my_list_status ? animeData.my_list_status.num_episodes_watched : 0} data-ani-id={animeData?.id}>
+                            <p> / {animeData.num_episodes}</p>
+                            <button on:click={handleEpisodesButtonClick} data-ani-id={animeData?.id}>
+                                <span class="material-symbols-outlined">add</span>
+                            </button>
+                        </div>
 
                     </div>
 
@@ -141,6 +165,19 @@
     const fields = "status,genres,media_type,mean,rank,num_episodes,rating,my_list_status,alternative_titles,num_scoring_users,num_list_users,popularity,start_season,studios,synopsis"
 
     const selectOptions = ["watching", "completed", "on_hold", "dropped", "plan_to_watch"]
+    const selectScores = [
+        {value: 0, text: "Select"},
+        {value: 10, text: "10 Masterpiece"},
+        {value: 9, text: "9 Great"},
+        {value: 8, text: "8 Very Good"},
+        {value: 7, text: "7 Good"},
+        {value: 6, text: "6 Fine"},
+        {value: 5, text: "5 Average"},
+        {value: 4, text: "4 Bad"},
+        {value: 3, text: "3 Very Bad"},
+        {value: 2, text: "2 Horrible"},
+        {value: 1, text: "1 Appalling"}
+    ]
 
     onMount(async () => {
         title.set("Anime Details");
@@ -159,8 +196,6 @@
         }
 
         animeData = JSON.parse(response.data);
-
-        console.log(animeData)
     })
 
     function formatNumber(num) {
@@ -174,7 +209,7 @@
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
-    async function handleSelectChange(event) {
+    async function handleStatusSelectChange(event) {
         const id = event.target.attributes["data-ani-id"].value
         const postData = {
             "status": event.target.value
@@ -183,18 +218,7 @@
 
         const response = await PatchRequest(url, JSON.stringify(postData))
 
-        if(!response.data) {
-            Toast.fire({
-                icon: "error",
-                title: "Error updating list"
-            })
-            return
-        }
-
-        Toast.fire({
-            icon: "success",
-            title: "Updated list"
-        })
+        handleResponse(response)
     }
 
     async function handleAddToList(event) {
@@ -206,21 +230,79 @@
 
         const response = await PatchRequest(url, JSON.stringify(postData))
 
+        handleResponse(response)
+    }
+
+    async function handleScoreSelectChange(event) {
+        const id = event.target.attributes["data-ani-id"].value
+        const postData = {
+            "score": event.target.value
+        }
+        const url = `https://api.myanimelist.net/v2/anime/${id}/my_list_status`
+
+        const response = await PatchRequest(url, JSON.stringify(postData))
+
+        handleResponse(response)
+    }
+
+    async function handleEpisodesButtonClick(event) {
+        const id = event.target.attributes["data-ani-id"].value
+
+        let episodesWatched = animeData.my_list_status ? animeData.my_list_status.num_episodes_watched : 0
+
+        episodesWatched = episodesWatched + 1
+
+        if(episodesWatched > animeData.num_episodes) {
+            episodesWatched = animeData.num_episodes
+        }
+
+        const postData = {
+            num_watched_episodes: episodesWatched
+        }
+
+        const url = `https://api.myanimelist.net/v2/anime/${id}/my_list_status`
+
+        const response = await PatchRequest(url, JSON.stringify(postData))
+
+        handleResponse(response)
+    }
+
+    async function handleEpisodesInputFocus(event) {
+        const id = event.target.attributes["data-ani-id"].value
+        let episodesWatched = event.target.value
+
+        if(episodesWatched > animeData.num_episodes) {
+            episodesWatched = animeData.num_episodes
+        }
+
+        const postData = {
+            num_watched_episodes: episodesWatched
+        }
+
+        const url = `https://api.myanimelist.net/v2/anime/${id}/my_list_status`
+
+        const response = await PatchRequest(url, JSON.stringify(postData))
+
+        handleResponse(response)
+    }
+
+    /** @param {{success:boolean, data:any}} response */
+    function handleResponse(response) {
         if(!response.success) {
             Toast.fire({
                 icon: "error",
-                title: "Error adding to list"
+                title: "Error updating list"
             })
             return
         }
 
+        const data = JSON.parse(response.data)
+        animeData.my_list_status = data
+
         Toast.fire({
             icon: "success",
-            title: "Added to list"
+            title: "Updated list"
         })
-
-        animeData.my_list_status = {}
-        animeData.my_list_status.status = "plan_to_watch"
     }
 </script>
 
@@ -450,6 +532,46 @@
 
                         &:hover {
                             background-color: var(--mal-blue-dark);
+                        }
+                    }
+
+                    .episodes {
+                        display: flex;
+                        align-items: center;
+                        border: solid 2px var(--mal-blue);
+                        border-radius: 5px;
+                        height: 2rem;
+                        padding-inline: 0.5rem;
+
+                        p {
+                            margin: 0;
+                        }
+
+                        input {
+                            border: none;
+                            outline: none;
+                            background: transparent;
+                            width: 50px;
+                            text-align: right;
+                            font-size: 1rem;
+                        }
+
+                        input[type="number"]::-webkit-inner-spin-button,
+                        input[type="number"]::-webkit-outer-spin-button {
+                            -webkit-appearance: none;
+                            margin: 0;
+                        }
+
+                        button {
+                            all: unset;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            cursor: pointer;
+
+                            span {
+                                pointer-events: none;
+                            }
                         }
                     }
                 }
