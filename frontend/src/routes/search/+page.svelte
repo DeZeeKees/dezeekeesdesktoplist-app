@@ -57,13 +57,16 @@
     })
 
     afterNavigate(async () => {
-        if($page.params.query === "none") {
-            return;
+        const url = $page.url
+        const searchQuery = url.searchParams.get('query')
+
+        if(searchQuery === null) {
+            return
         }
 
-        searchInput.value = $page.params.query;
+        searchInput.value = searchQuery.replace(/_/g, " ");
 
-        let response = await GetRequest(`https://api.myanimelist.net/v2/anime?q=${searchInput.value}&fields=${fields}&limit=50`)
+        let response = await GetRequest(`https://api.myanimelist.net/v2/anime?q=${searchQuery}&fields=${fields}&limit=50`)
 
         if(!response.success) {
             Toast.fire({
@@ -79,24 +82,26 @@
     })
 
     async function handleSearch(event) {
-        let searchValue = searchInput.value.replace(/\s/g, "");
+        let searchValue = searchInput.value.replace(/\s/g, "_");
 
         // if both are false pass the if statement
         if (event.key !== "Enter" || searchValue.length < 3) {
             return;
         }
 
-        goto(`/search/${searchValue}`)
+        goto(`/search?query=${searchValue}`)
     }
 
     async function handleSearchClick() {
-        let searchValue = searchInput.value.replace(/\s/g, "");
+        let searchValue = searchInput.value.replace(/\s/g, "_");
 
         if(searchValue.length < 3) {
             return;
         }
 
-        goto(`/search/${searchValue}`)
+        console.log(searchValue)
+
+        goto(`/search?query=${searchValue}`)
     }
 </script>
 

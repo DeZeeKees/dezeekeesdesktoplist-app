@@ -145,7 +145,10 @@
     onMount(async () => {
         title.set("Anime Details");
 
-        let response = await GetRequest(`https://api.myanimelist.net/v2/anime/${$page.params.id}?fields=${fields}`)
+        const url = $page.url
+        const id = url.searchParams.get('id')
+
+        let response = await GetRequest(`https://api.myanimelist.net/v2/anime/${id}?fields=${fields}`)
 
         if(!response.success) {
             Toast.fire({
@@ -456,8 +459,8 @@
                     display: flex;
                     flex-direction: column;
                     gap: 0.5rem;
-
                     height: 100%;
+                    position: relative;
 
                     h2 {
                         margin: 0;
@@ -465,14 +468,15 @@
                     }
 
                     p {
+                        --_scrollbar-width: 0.5rem;
                         margin: 0;
-                        overflow-y: scroll;
-
-                        // keep space and new lines in text
                         white-space: pre-wrap;
+                        padding-bottom: 2rem;
+
+                        overflow-y: auto;
 
                         &::-webkit-scrollbar {
-                            width: 0.5rem;
+                            width: var(--_scrollbar-width);
                         }
 
                         &::-webkit-scrollbar-thumb {
@@ -483,12 +487,6 @@
                 }
             }
         }
-    }
-
-    .center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
 
 </style>
