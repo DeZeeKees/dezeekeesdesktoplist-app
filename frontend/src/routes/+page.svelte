@@ -34,8 +34,8 @@
             </div>
             <p>Score</p>
             <select bind:value={$popover.score}>
-                {#each [0,1,2,3,4,5,6,7,8,9,10] as score}
-                    <option value={score}>{score}</option>
+                {#each selectScores as score}
+                    <option value={score.value}>{score.text}</option>
                 {/each}
             </select>
             <p>Rewatching</p>
@@ -75,6 +75,20 @@
         {name: "Dropped"},
         {name: "All"},
         {name: "Plan to Watch"}
+    ]
+
+    const selectScores = [
+        {value: 0, text: "Select"},
+        {value: 10, text: "10 Masterpiece"},
+        {value: 9, text: "9 Great"},
+        {value: 8, text: "8 Very Good"},
+        {value: 7, text: "7 Good"},
+        {value: 6, text: "6 Fine"},
+        {value: 5, text: "5 Average"},
+        {value: 4, text: "4 Bad"},
+        {value: 3, text: "3 Very Bad"},
+        {value: 2, text: "2 Horrible"},
+        {value: 1, text: "1 Appalling"}
     ]
     
     let ListResponse = undefined
