@@ -16,7 +16,6 @@
             </div>
 
             <div class="row">
-                <img src="/anime-placeholder.jpg" alt="Empty anime poster">
 
                 <div class="fullwidth content">
 
@@ -46,6 +45,8 @@
                         <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et facere id nisi vitae, necessitatibus molestias aliquid qui ipsum rerum soluta ad rem, amet cupiditate nostrum laborum laudantium enim modi sapiente?</p>
                     </div>
                 </div>
+
+                <img src="/anime-placeholder.jpg" alt="Empty anime poster">
 
             </div>
 
