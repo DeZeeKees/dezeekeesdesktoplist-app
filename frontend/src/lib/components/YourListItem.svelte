@@ -60,18 +60,10 @@
     import { PatchRequest } from "$lib/wailsjs/go/main/App";
     import { Toast } from '$lib/index'
     import { popover } from "$lib/store";
+    import { formatDate } from "$lib";
 
     export let data = {}
     let item
-
-    /**
-     * @param date {string}
-     */
-    function formatDate(date) {
-        let d = new Date(date)
-        const formatter = new Intl.DateTimeFormat('en', { month: 'short' });
-        return `${d.getDate()} ${formatter.format(d)} ${d.getFullYear()}`
-    }
 
     async function incrementEpisodes(id) {
         let url = `https://api.myanimelist.net/v2/anime/${id}/my_list_status`

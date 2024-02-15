@@ -160,6 +160,7 @@
     import { title } from "$lib/store";
     import { GetRequest, PatchRequest } from "$lib/wailsjs/go/main/App";
     import { onMount } from "svelte";
+    import { capitalize, formatNumber } from "$lib";
 
     let animeData = undefined;
     const fields = "status,genres,media_type,mean,rank,num_episodes,rating,my_list_status,alternative_titles,num_scoring_users,num_list_users,popularity,start_season,studios,synopsis"
@@ -197,17 +198,6 @@
 
         animeData = JSON.parse(response.data);
     })
-
-    function formatNumber(num) {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
-    function capitalize(string) {
-        // replace all underscores with spaces
-        string = string.replace(/_/g, " ");
-        // capitalize first letter
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
 
     async function handleStatusSelectChange(event) {
         const id = event.target.attributes["data-ani-id"].value

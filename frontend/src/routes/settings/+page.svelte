@@ -42,7 +42,7 @@
                 {#if releaseInfo.isLatest}
                     <h2>You are up to date</h2>
                     <p>Current version: {version}</p>
-                    <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
+                    <p>Release date: {formatDate(releaseInfo.release.published_at)}</p>
                     <div class="buttons">
                         <button on:click={() => BrowserOpenURL(releaseInfo.release.html_url)}>Release notes</button>
                     </div>
@@ -50,7 +50,7 @@
                     <h2>Update available</h2>
                     <p>Current version: {version}</p>
                     <p>Latest version: {releaseInfo.release.tag_name}</p>
-                    <p>Release date: {formateStringDate(releaseInfo.release.published_at)}</p>
+                    <p>Release date: {formatDate(releaseInfo.release.published_at)}</p>
                     <div class="buttons">
                         <button on:click={() => BrowserOpenURL(releaseInfo.release.html_url)}>Release notes</button>
                         <button on:click={handleDownload}>Download</button>
@@ -70,7 +70,7 @@
     import Tabs from "$lib/components/tabs.svelte";
     import { title } from "$lib/store";
     import { BrowserOpenURL } from "$lib/wailsjs/runtime/runtime";
-    import { Toast } from "$lib";
+    import { Toast, formatDate, capitalize } from "$lib";
 
     let version;
     let releaseInfo = undefined;
@@ -102,21 +102,7 @@
 
     function handleTabChange(event) {
         currentTab = event.detail;
-        title.set(`Settings - ${capitalizeFirstLetter(event.detail)}`);
-    }
-
-    function capitalizeFirstLetter(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-    function formateStringDate(date) {
-        date = new Date(date);
-
-        if(isNaN(date.getDate())) {
-            return "Unknown";
-        }
-
-        return `${date.getDate()}-${(date.getMonth() + 1)}-${date.getFullYear()}`
+        title.set(`Settings - ${capitalize(event.detail)}`);
     }
 
     async function handleDownload() {
