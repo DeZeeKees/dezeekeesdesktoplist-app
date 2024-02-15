@@ -8,48 +8,48 @@
 
 <main>
     {#if animeData === undefined}
-    <div class="flex">
+        <div class="flex">
 
-        <div class="title block">
-            <h1>Anime Title</h1>
-            <h2>English Title</h2>
-        </div>
+            <div class="title block">
+                <h1>Anime Title</h1>
+                <h2>English Title</h2>
+            </div>
 
-        <div class="row">
-            <img src="/anime-placeholder.jpg" alt="Empty anime poster">
+            <div class="row">
+                <img src="/anime-placeholder.jpg" alt="Empty anime poster">
 
-            <div class="fullwidth content">
+                <div class="fullwidth content">
 
-                <div class="block score">
-                    <p>Score</p>
-                    <h2>N/A</h2>
-                    <span>N/A Users</span>
-                </div>
-                
-                <div class="block rank">
-                    <div class="top">
-                        <p>Ranked <span class="bold">#N/A</span></p>
-                        <p>Popularity <span class="bold">#N/A</span></p>
-                        <p>Members <span class="bold">N/A</span></p>
+                    <div class="block score">
+                        <p>Score</p>
+                        <h2>N/A</h2>
+                        <span>N/A Users</span>
                     </div>
-                    <div class="bottom">
+                    
+                    <div class="block rank">
+                        <div class="top">
+                            <p>Ranked <span class="bold">#N/A</span></p>
+                            <p>Popularity <span class="bold">#N/A</span></p>
+                            <p>Members <span class="bold">N/A</span></p>
+                        </div>
+                        <div class="bottom">
 
+                        </div>
+                    </div>
+
+                    <div class="block actions">
+                        <button class="primary">Add to List</button>
+                    </div>
+
+                    <div class="block synopsis">
+                        <h2>Synopsis</h2>
+                        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et facere id nisi vitae, necessitatibus molestias aliquid qui ipsum rerum soluta ad rem, amet cupiditate nostrum laborum laudantium enim modi sapiente?</p>
                     </div>
                 </div>
 
-                <div class="block actions">
-                    <button class="primary">Add to List</button>
-                </div>
-
-                <div class="block synopsis">
-                    <h2>Synopsis</h2>
-                    <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et facere id nisi vitae, necessitatibus molestias aliquid qui ipsum rerum soluta ad rem, amet cupiditate nostrum laborum laudantium enim modi sapiente?</p>
-                </div>
             </div>
 
         </div>
-
-    </div>
     {:else}
         <div class="flex">
 
@@ -58,8 +58,7 @@
                 <h2>{animeData?.alternative_titles.en}</h2>
             </div>
 
-            <div class="row">
-                <img src={animeData?.main_picture.large} alt={"poster " + animeData?.title}>
+            <div class="row main-info">
 
                 <div class="fullwidth content">
 
@@ -149,9 +148,41 @@
 
                 </div>
 
+                <img src={animeData?.main_picture.large} alt={"poster " + animeData?.title}>
+
+            </div>
+
+            <div class="row extra-info">
+                
+                <div class="left block">
+
+                </div>
+
+                <div class="right fullwidth">
+
+                    <div class="photos block">
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <div class="content">
+                            {#each animeData?.pictures as picture}
+                                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                <!-- svelte-ignore a11y-no-noninteractive-element-to-interactive-role -->
+                                <img src={picture.large} alt={picture.large} on:click={openPhotoPopup} role="button" tabindex="0">
+                            {/each}
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     {/if}
+
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="photo-popup hidden" bind:this={photoPopup} on:click={closePhotoPopup} role="button" tabindex="0">
+        <div class="content">
+            <img src="" alt="">
+        </div>
+    </div>
 </main>
 
 <script>
@@ -163,7 +194,7 @@
     import { capitalize, formatNumber } from "$lib";
 
     let animeData = undefined;
-    const fields = "status,genres,media_type,mean,rank,num_episodes,rating,my_list_status,alternative_titles,num_scoring_users,num_list_users,popularity,start_season,studios,synopsis"
+    const fields = "status,genres,media_type,mean,rank,num_episodes,rating,my_list_status,alternative_titles,num_scoring_users,num_list_users,popularity,start_season,studios,synopsis,pictures"
 
     const selectOptions = ["watching", "completed", "on_hold", "dropped", "plan_to_watch"]
     const selectScores = [
@@ -179,6 +210,8 @@
         {value: 2, text: "2 Horrible"},
         {value: 1, text: "1 Appalling"}
     ]
+
+    let photoPopup
 
     onMount(async () => {
         title.set("Anime Details");
@@ -294,6 +327,16 @@
             title: "Updated list"
         })
     }
+
+    function openPhotoPopup(event) {
+        const img = event.target
+        photoPopup.querySelector("img").src = img.src
+        photoPopup.classList.remove("hidden")
+    }
+
+    function closePhotoPopup() {
+        photoPopup.classList.add("hidden")
+    }
 </script>
 
 <style lang="less">
@@ -341,6 +384,10 @@
                 gap: var(--_gap);
             }
 
+            .row:last-child {
+                padding-bottom: 2.5rem;
+            }
+
             .block {
                 padding: 0.5rem 1rem;
                 background: color-mix(in srgb, var(--text-white), var(--mal-blue) 10%);;
@@ -371,233 +418,321 @@
                 }
             }
 
-            img {
-                grid-area: "1-image";
-                width: 21rem;
-                height: 30rem;
-                object-fit: cover;
-                user-select: none;
-                border-radius: 0.25rem;
-            }
+            .main-info {
 
-            .content {
-                height: 30rem;
-                display: grid;
-                gap: var(--_gap);
-                grid-template-areas: 
-                "score rank"
-                "actions actions"
-                "synopsis synopsis";
-
-                grid-template-rows: 8rem 3rem 17rem;
-                grid-template-columns: 8rem 1fr;
-
-                .score {
-                    grid-area: score;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-
-                    p {
-                        margin: 0;
-                        font-size: 1rem;
-                        padding: 0.25rem 1rem;
-                        background-color: var(--mal-blue);
-                        color: var(--text-white);
-                        border-radius: 0.5rem;
-                    }
-
-                    h2 {
-                        margin: 0;
-                        font-size: 2rem;
-                    }
+                img {
+                    grid-area: "1-image";
+                    width: 21rem;
+                    height: 30rem;
+                    object-fit: cover;
+                    user-select: none;
+                    border-radius: 0.25rem;
+                    -webkit-user-drag: none;
                 }
 
-                .rank {
-                    grid-area: rank;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    gap: 1rem;
+                .content {
+                    height: 30rem;
+                    display: grid;
+                    gap: var(--_gap);
+                    grid-template-areas: 
+                    "score rank"
+                    "actions actions"
+                    "synopsis synopsis";
 
-                    .top {
+                    grid-template-rows: 8rem 3rem 17rem;
+                    grid-template-columns: 8rem 1fr;
+
+                    .score {
+                        grid-area: score;
                         display: flex;
-                        gap: 1.5rem;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
 
                         p {
                             margin: 0;
-                            font-size: 1.2rem;
+                            font-size: 1rem;
+                            padding: 0.25rem 1rem;
+                            background-color: var(--mal-blue);
+                            color: var(--text-white);
+                            border-radius: 0.5rem;
+                        }
+
+                        h2 {
+                            margin: 0;
+                            font-size: 2rem;
                         }
                     }
 
-                    .bottom {
+                    .rank {
+                        grid-area: rank;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        gap: 1rem;
+
+                        .top {
+                            display: flex;
+                            gap: 1.5rem;
+
+                            p {
+                                margin: 0;
+                                font-size: 1.2rem;
+                            }
+                        }
+
+                        .bottom {
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+
+                            height: 1.5rem;
+                        
+                            hr {
+                                height: 100%;
+                                margin: 0.5rem 0;
+                                border: none;
+                                border-left: 2px solid #c6c6c6;
+                            }
+
+                            p {
+                                margin: 0;
+                                font-size: 1rem;
+                                font-weight: 500;
+                                color: var(--mal-blue);
+                            }
+
+                            .studios {
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 0.5rem;
+                            }
+                        }
+                    }
+
+                    .actions {
+                        --_button-height: 2rem;
+                        --_border_radius: 0.5rem;
+                        grid-area: actions;
                         display: flex;
                         align-items: center;
                         gap: 1rem;
 
-                        height: 1.5rem;
-                    
-                        hr {
-                            height: 100%;
-                            margin: 0.5rem 0;
-                            border: none;
-                            border-left: 2px solid #c6c6c6;
-                        }
-
-                        p {
-                            margin: 0;
-                            font-size: 1rem;
-                            font-weight: 500;
-                            color: var(--mal-blue);
-                        }
-
-                        .studios {
+                        .select-container {
                             display: flex;
-                            flex-wrap: wrap;
-                            gap: 0.5rem;
-                        }
-                    }
-                }
+                            --_border: 2px solid var(--mal-blue);
 
-                .actions {
-                    --_button-height: 2rem;
-                    --_border_radius: 0.5rem;
-                    grid-area: actions;
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-
-                    .select-container {
-                        display: flex;
-                        --_border: 2px solid var(--mal-blue);
-
-                        select {
-                            all: unset;
-                            padding: 0 0rem 0 1rem;
-                            border-top-left-radius: 0.5rem;
-                            border-bottom-left-radius: 0.5rem;
-                            color: var(--text-black);
-                            cursor: pointer;
-                            transition: all 0.2s ease-in-out;
-                            display: flex;
-                            align-items: center;
-                            border: var(--_border);
-                            border-right: none;
-                        }
-
-                        label {
-                            height: var(--_button-height);
-                            border-top-right-radius: 0.5rem;
-                            border-bottom-right-radius: 0.5rem;
-                            color: var(--text-black);
-                            cursor: pointer;
-                            transition: all 0.2s ease-in-out;
-                            display: flex;
-                            align-items: center;
-                            border: var(--_border);
-                            border-left: none;
-
-                            span {
-                                user-select: none;
-                                pointer-events: all;
+                            select {
+                                all: unset;
+                                padding: 0 0rem 0 1rem;
+                                border-top-left-radius: 0.5rem;
+                                border-bottom-left-radius: 0.5rem;
+                                color: var(--text-black);
+                                cursor: pointer;
+                                transition: all 0.2s ease-in-out;
+                                display: flex;
+                                align-items: center;
+                                border: var(--_border);
+                                border-right: none;
                             }
-                        }
-                    }
 
-                    button {
-                        all: unset;
-                        height: var(--_button-height);
-                        padding: 0 1rem;
-                        border-radius: 0.5rem;
-                        border: none;
-                        background-color: var(--mal-blue);
-                        color: var(--text-white);
-                        cursor: pointer;
-                        transition: all 0.2s ease-in-out;
+                            label {
+                                height: var(--_button-height);
+                                border-top-right-radius: 0.5rem;
+                                border-bottom-right-radius: 0.5rem;
+                                color: var(--text-black);
+                                cursor: pointer;
+                                transition: all 0.2s ease-in-out;
+                                display: flex;
+                                align-items: center;
+                                border: var(--_border);
+                                border-left: none;
 
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-
-                        &:hover {
-                            background-color: var(--mal-blue-dark);
-                        }
-                    }
-
-                    .episodes {
-                        display: flex;
-                        align-items: center;
-                        border: solid 2px var(--mal-blue);
-                        border-radius: 5px;
-                        height: 2rem;
-                        padding-inline: 0.5rem;
-
-                        p {
-                            margin: 0;
-                        }
-
-                        input {
-                            border: none;
-                            outline: none;
-                            background: transparent;
-                            width: 50px;
-                            text-align: right;
-                            font-size: 1rem;
-                        }
-
-                        input[type="number"]::-webkit-inner-spin-button,
-                        input[type="number"]::-webkit-outer-spin-button {
-                            -webkit-appearance: none;
-                            margin: 0;
+                                span {
+                                    user-select: none;
+                                    pointer-events: all;
+                                }
+                            }
                         }
 
                         button {
                             all: unset;
-                            height: 100%;
+                            height: var(--_button-height);
+                            padding: 0 1rem;
+                            border-radius: 0.5rem;
+                            border: none;
+                            background-color: var(--mal-blue);
+                            color: var(--text-white);
+                            cursor: pointer;
+                            transition: all 0.2s ease-in-out;
+
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+
+                            &:hover {
+                                background-color: var(--mal-blue-dark);
+                            }
+                        }
+
+                        .episodes {
                             display: flex;
                             align-items: center;
-                            cursor: pointer;
+                            border: solid 2px var(--mal-blue);
+                            border-radius: 5px;
+                            height: 2rem;
+                            padding-inline: 0.5rem;
 
-                            span {
-                                pointer-events: none;
+                            p {
+                                margin: 0;
+                            }
+
+                            input {
+                                border: none;
+                                outline: none;
+                                background: transparent;
+                                width: 50px;
+                                text-align: right;
+                                font-size: 1rem;
+                            }
+
+                            input[type="number"]::-webkit-inner-spin-button,
+                            input[type="number"]::-webkit-outer-spin-button {
+                                -webkit-appearance: none;
+                                margin: 0;
+                            }
+
+                            button {
+                                all: unset;
+                                height: 100%;
+                                display: flex;
+                                align-items: center;
+                                cursor: pointer;
+
+                                span {
+                                    pointer-events: none;
+                                }
+                            }
+                        }
+                    }
+
+                    .synopsis {
+                        grid-area: synopsis;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5rem;
+                        height: 100%;
+                        position: relative;
+
+                        h2 {
+                            margin: 0;
+                            font-size: 1.5rem;
+                        }
+
+                        p {
+                            --_scrollbar-width: 0.5rem;
+                            margin: 0;
+                            white-space: pre-wrap;
+                            padding-bottom: 2rem;
+
+                            overflow-y: auto;
+
+                            &::-webkit-scrollbar {
+                                width: var(--_scrollbar-width);
+                            }
+
+                            &::-webkit-scrollbar-thumb {
+                                background-color: gray;
+                                border-radius: 0.25rem;
                             }
                         }
                     }
                 }
+            }
 
-                .synopsis {
-                    grid-area: synopsis;
-                    display: flex;
+            .extra-info {
+                --_left-width: 21rem;
+
+                .left {
+                    width: 21rem;
+                }
+
+                .right {
+                    width: calc(100% - var(--_left-width));
+                    display: flex; 
                     flex-direction: column;
-                    gap: 0.5rem;
-                    height: 100%;
-                    position: relative;
+                    gap: var(--_gap);
+                    padding: 0;
 
-                    h2 {
-                        margin: 0;
-                        font-size: 1.5rem;
-                    }
+                    .photos {
+                        .content {
+                            display: flex;
+                            flex-wrap: nowrap;
+                            gap: 1rem;
+                            overflow-x: auto;
+                            user-select: none;
 
-                    p {
-                        --_scrollbar-width: 0.5rem;
-                        margin: 0;
-                        white-space: pre-wrap;
-                        padding-bottom: 2rem;
+                            img {
+                                height: 15rem;
+                                object-fit: cover;
+                                border-radius: 0.25rem;
+                                margin-bottom: 5px;
+                                -webkit-user-drag: none;
+                                cursor: pointer;
+                            }
 
-                        overflow-y: auto;
+                            &::-webkit-scrollbar {
+                                width: 1px;
+                                height: 5px;
+                            }
 
-                        &::-webkit-scrollbar {
-                            width: var(--_scrollbar-width);
-                        }
-
-                        &::-webkit-scrollbar-thumb {
-                            background-color: gray;
-                            border-radius: 0.25rem;
-                        }
+                            &::-webkit-scrollbar-thumb {
+                                background-color: gray;
+                                border-radius: 0.25rem;
+                            }
+                        }                        
                     }
                 }
+
             }
+        }
+    }
+
+    .photo-popup {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+
+        .content {
+            width: 80%;
+            height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                -webkit-user-drag: none;
+                user-select: none;
+                border-radius: 0.5rem;
+            }
+        }
+
+        &.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
     }
 
