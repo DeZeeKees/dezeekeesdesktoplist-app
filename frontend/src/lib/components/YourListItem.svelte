@@ -10,7 +10,10 @@
                     {data.node.media_type.charAt(0).toUpperCase() + data.node.media_type.slice(1)}
                 </p>
 
-                <button on:mouseup={handleEdit}>Edit</button>
+                <div class="actions">
+                    <a href={"/anime?id=" + data.node.id}>View</a>
+                    <button on:mouseup={handleEdit}>Edit</button>
+                </div>
             </div>
 
             <div class="row two">
@@ -195,7 +198,12 @@
                     display: flex;
                     justify-content: space-between;
 
-                    button {
+                    .actions {
+                        display: flex;
+                        gap: .5rem;
+                    }
+
+                    button,a {
                         all: unset;
                         display: flex;
                         justify-content: center;
@@ -205,7 +213,8 @@
                         transition: all .1s ease-in-out;
                     }
 
-                    button:hover {
+                    button:hover,
+                    a:hover {
                         color: var(--text-white);
                         font-weight: 600;
                         transform: scale(1.1);
