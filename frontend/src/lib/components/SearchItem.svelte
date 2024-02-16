@@ -6,7 +6,7 @@
 
     <div class="right">
         <h2>#{formatRank(data.node.rank)} {data.node.title}</h2>
-        <div>{@html formatGenres(data.node.genres)}</div>
+        <div>{@html formatSearchGenres(data.node.genres)}</div>
         <p>
             {@html capitalize(data.node.media_type)} -
             {data.node.mean == null ? "N/A" : data.node.mean.toFixed(2)} -
@@ -33,7 +33,7 @@
                 </label>
             </div>
             {/if}
-            <a href="#none">View Anime</a>
+            <a href={"/anime?id=" + data.node.id}>View Anime</a>
         </div>
     </div>
 
@@ -42,25 +42,13 @@
 <script>
     import { Toast } from "$lib";
     import { PatchRequest } from "$lib/wailsjs/go/main/App";
+    import { capitalize, formatRating, formatRank, formatStatus } from "$lib";
 
     export let data = {}
 
     let selectOptions = ["watching", "completed", "on_hold", "dropped", "plan_to_watch"]
 
-    function formatStatus(status) {
-        switch(status) {
-            case "finished_airing":
-                return "<span style='color: #3F51B5;'>Finished Airing</span>";
-            case "currently_airing":
-                return "<span style='color: #4CAF50;'>Currently Airing</span>";
-            case "not_yet_aired":
-                return "<span style='color: #F44336;'>Not Yet Aired</span>";
-            default:
-                return status;
-        }
-    }
-
-    function formatGenres(genres) {
+    function formatSearchGenres(genres) {
         let genresString = ""
 
         if(genres === undefined || genres === null) return "<span class='chip'>N/A</span>";
@@ -70,37 +58,6 @@
         })
 
         return genresString;
-    }
-
-    function capitalize(string) {
-        // replace all underscores with spaces
-        string = string.replace(/_/g, " ");
-        // capitalize first letter
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-    function formatRating(rating) {
-        switch(rating) {
-            case "g":
-                return "G - All Ages";
-            case "pg":
-                return "PG - Children";
-            case "pg_13":
-                return "PG-13 - Teens 13 or older";
-            case "r":
-                return "R - 17+ (violence & profanity)";
-            case "r+":
-                return "R+ - Mild Nudity";
-            case "rx":
-                return "Rx - Hentai";
-            default:
-                return "N/A";
-        }
-    }
-
-    function formatRank(rank) {
-        if(rank === null || rank === undefined) return "N/A";
-        return rank;
     }
 
     async function handleSelectChange(event) {

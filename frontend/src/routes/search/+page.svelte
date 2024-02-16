@@ -34,6 +34,8 @@
     import { GetRequest, GetSettings } from "$lib/wailsjs/go/main/App";
     import { onMount } from "svelte";
     import { Toast } from "$lib";
+    import { page } from "$app/stores";
+    import { afterNavigate, goto } from "$app/navigation";
 
     let searchData = undefined;
     let searchItems = [];
@@ -54,49 +56,52 @@
         settings = await GetSettings()
     })
 
+    afterNavigate(async () => {
+        const url = $page.url
+        const searchQuery = url.searchParams.get('query')
+
+        if(searchQuery === null) {
+            return
+        }
+
+        searchInput.value = searchQuery.replace(/_/g, " ");
+
+        let response = await GetRequest(`https://api.myanimelist.net/v2/anime?q=${searchQuery}&fields=${fields}&limit=50`)
+
+        if(!response.success) {
+            Toast.fire({
+                icon: "error",
+                title: "Could not find anime"
+            })
+            return
+        }
+
+        searchData = JSON.parse(response.data);
+
+        searchItems = searchData.data;
+    })
+
     async function handleSearch(event) {
-        let searchValue = searchInput.value.replace(/\s/g, "");
+        let searchValue = searchInput.value.replace(/\s/g, "_");
 
         // if both are false pass the if statement
         if (event.key !== "Enter" || searchValue.length < 3) {
             return;
         }
 
-        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue + "&nsfw=" + settings.nsfwContent)
-
-        if(!response.success) {
-            Toast.fire({
-                icon: "error",
-                title: "Something went wrong"
-            })
-            return
-        }
-
-        searchData = JSON.parse(response.data);
-        
-        searchItems = searchData.data;
+        goto(`/search?query=${searchValue}`)
     }
 
     async function handleSearchClick() {
-        let searchValue = searchInput.value.replace(/\s/g, "");
+        let searchValue = searchInput.value.replace(/\s/g, "_");
 
         if(searchValue.length < 3) {
             return;
         }
 
-        const response = await GetRequest("https://api.myanimelist.net/v2/anime?limit=30&fields=" + fields +"&q=" + searchValue + "&nsfw=" + settings.nsfwContent)
+        console.log(searchValue)
 
-        if(!response.success) {
-            Toast.fire({
-                icon: "error",
-                title: "Something went wrong"
-            })
-            return
-        }
-
-        searchData = JSON.parse(response.data);
-        
-        searchItems = searchData.data;
+        goto(`/search?query=${searchValue}`)
     }
 </script>
 

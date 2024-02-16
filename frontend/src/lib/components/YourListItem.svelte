@@ -10,7 +10,10 @@
                     {data.node.media_type.charAt(0).toUpperCase() + data.node.media_type.slice(1)}
                 </p>
 
-                <button on:mouseup={handleEdit}>Edit</button>
+                <div class="actions">
+                    <a href={"/anime?id=" + data.node.id}>View</a>
+                    <button on:mouseup={handleEdit}>Edit</button>
+                </div>
             </div>
 
             <div class="row two">
@@ -60,18 +63,10 @@
     import { PatchRequest } from "$lib/wailsjs/go/main/App";
     import { Toast } from '$lib/index'
     import { popover } from "$lib/store";
+    import { formatDate } from "$lib";
 
     export let data = {}
     let item
-
-    /**
-     * @param date {string}
-     */
-    function formatDate(date) {
-        let d = new Date(date)
-        const formatter = new Intl.DateTimeFormat('en', { month: 'short' });
-        return `${d.getDate()} ${formatter.format(d)} ${d.getFullYear()}`
-    }
 
     async function incrementEpisodes(id) {
         let url = `https://api.myanimelist.net/v2/anime/${id}/my_list_status`
@@ -203,7 +198,12 @@
                     display: flex;
                     justify-content: space-between;
 
-                    button {
+                    .actions {
+                        display: flex;
+                        gap: .5rem;
+                    }
+
+                    button,a {
                         all: unset;
                         display: flex;
                         justify-content: center;
@@ -213,7 +213,8 @@
                         transition: all .1s ease-in-out;
                     }
 
-                    button:hover {
+                    button:hover,
+                    a:hover {
                         color: var(--text-white);
                         font-weight: 600;
                         transform: scale(1.1);

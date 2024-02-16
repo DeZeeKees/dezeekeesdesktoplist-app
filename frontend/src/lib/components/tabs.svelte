@@ -6,7 +6,7 @@
 
             <div class="top">
                 <a href="/" class={$page.url.pathname === '/' ? 'active' : ''}>Your List</a>
-                <a href="/search" class={$page.url.pathname === '/search' ? 'active' : ''}>Search</a>
+                <a href="/search" class={$page.url.pathname.includes("/search") ? 'active' : ''}>Search</a>
                 <!-- @todo implement these pages -->
                 <!-- <a href="#temp" class={$page.url.pathname === '/seasonal' ? 'active' : ''}>Seasonal</a>
                 <a href="#temp" class={$page.url.pathname === '/ranking' ? 'active' : ''}>Ranking</a> -->
