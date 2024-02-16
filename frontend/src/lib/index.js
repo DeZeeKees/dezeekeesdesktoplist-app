@@ -62,3 +62,8 @@ export function formatDate(date) {
     const formatter = new Intl.DateTimeFormat('en', { month: 'short' });
     return `${d.getDate()} ${formatter.format(d)} ${d.getFullYear()}`
 }
+
+export function checkNull(value) {
+    if(value === null || value === undefined) return "N/A";
+    return value;
+}

@@ -7,95 +7,58 @@
 </nav>
 
 <main>
-    {#if animeData === undefined}
-        <div class="flex">
+    <div class="flex">
 
-            <div class="title block">
-                <h1>Anime Title</h1>
-                <h2>English Title</h2>
-            </div>
-
-            <div class="row">
-
-                <div class="fullwidth content">
-
-                    <div class="block score">
-                        <p>Score</p>
-                        <h2>N/A</h2>
-                        <span>N/A Users</span>
-                    </div>
-                    
-                    <div class="block rank">
-                        <div class="top">
-                            <p>Ranked <span class="bold">#N/A</span></p>
-                            <p>Popularity <span class="bold">#N/A</span></p>
-                            <p>Members <span class="bold">N/A</span></p>
-                        </div>
-                        <div class="bottom">
-
-                        </div>
-                    </div>
-
-                    <div class="block actions">
-                        <button class="primary">Add to List</button>
-                    </div>
-
-                    <div class="block synopsis">
-                        <h2>Synopsis</h2>
-                        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et facere id nisi vitae, necessitatibus molestias aliquid qui ipsum rerum soluta ad rem, amet cupiditate nostrum laborum laudantium enim modi sapiente?</p>
-                    </div>
-                </div>
-
-                <img src="/anime-placeholder.jpg" alt="Empty anime poster">
-
-            </div>
-
+        <div class="title block">
+            <h1>{checkNull(animeData?.title)}</h1>
+            <h2>{checkNull(animeData?.alternative_titles?.en)}</h2>
         </div>
-    {:else}
-        <div class="flex">
 
-            <div class="title block">
-                <h1>{animeData?.title}</h1>
-                <h2>{animeData?.alternative_titles.en}</h2>
-            </div>
+        <div class="row main-info">
 
-            <div class="row main-info">
+            <div class="fullwidth content">
 
-                <div class="fullwidth content">
-
-                    <div class="block score">
-                        <p>Score</p>
-                        <h2>{animeData?.mean}</h2>
-                        <span>{animeData?.num_scoring_users} Users</span>
+                <div class="block score">
+                    <p>Score</p>
+                    <h2>{checkNull(animeData?.mean)}</h2>
+                    <span>{checkNull(animeData?.num_scoring_users)} Users</span>
+                </div>
+                
+                <div class="block rank">
+                    <div class="top">
+                        <p>Ranked <span class="bold">#{checkNull(animeData?.rank)}</span></p>
+                        <p>Popularity <span class="bold">#{animeData?.popularity}</span></p>
+                        <p>Members <span class="bold">
+                            {formatNumber(
+                                checkNull(animeData?.num_list_users)
+                            )}
+                        </span></p>
                     </div>
-                    
-                    <div class="block rank">
-                        <div class="top">
-                            <p>Ranked <span class="bold">#{animeData?.rank}</span></p>
-                            <p>Popularity <span class="bold">#{animeData?.popularity}</span></p>
-                            <p>Members <span class="bold">{formatNumber(animeData?.num_list_users)}</span></p>
-                        </div>
-                        <div class="bottom">
-                            {#if animeData?.start_season != null}
-                                <p>{capitalize(animeData?.start_season.season)} {animeData?.start_season.year}</p>
-                                <hr>
-                            {/if}
-
-                            <p>{capitalize(animeData?.media_type)}</p>
+                    <div class="bottom">
+                        {#if animeData?.start_season != null}
+                            <p>{capitalize(checkNull(animeData?.start_season?.season))} {checkNull(animeData?.start_season?.year)}</p>
                             <hr>
+                        {/if}
 
-                            <div class="studios">
+                        <p>{capitalize(checkNull(animeData?.media_type))}</p>
+                        <hr>
+
+                        <div class="studios">
+                            {#if checkNull(animeData) !== "N/A"}
                                 {#each animeData?.studios as studio, index}
                                     <p>{studio.name}</p>
                                     {#if index < animeData?.studios.length - 1}
                                         <span>&bull;</span>
                                     {/if}
                                 {/each}
-                            </div>
+                            {/if}
                         </div>
                     </div>
+                </div>
 
-                    <div class="block actions">
+                <div class="block actions">
+
+                    {#if checkNull(animeData) !== "N/A"}
 
                         {#if animeData?.my_list_status == null}
                             <button class="primary" on:click={handleAddToList} data-ani-id={animeData?.id}>Add to List</button>
@@ -140,29 +103,32 @@
                             </button>
                         </div>
 
-                    </div>
-
-                    <div class="block synopsis">
-                        <h2>Synopsis</h2>
-                        <p>{animeData?.synopsis}</p>
-                    </div>
+                    {/if}
 
                 </div>
 
-                <img src={animeData?.main_picture.large} alt={"poster " + animeData?.title}>
+                <div class="block synopsis">
+                    <h2>Synopsis</h2>
+                    <p>{checkNull(animeData?.synopsis)}</p>
+                </div>
 
             </div>
 
-            <div class="row extra-info">
-                
-                <div class="left block">
+            <img src={animeData !== undefined ? animeData.main_picture.large : "/anime-placeholder.jpg"} alt={"poster " + checkNull(animeData?.title)}>
 
-                </div>
+        </div>
 
-                <div class="right fullwidth">
+        <div class="row extra-info">
+            
+            <div class="left block">
 
-                    <div class="photos block">
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+            </div>
+
+            <div class="right fullwidth">
+
+                <div class="photos block">
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
+                    {#if checkNull(animeData) !== "N/A"}
                         <div class="content">
                             {#each animeData?.pictures as picture}
                                 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -170,29 +136,28 @@
                                 <img src={picture.large} alt={picture.large} on:click={openPhotoPopup} role="button" tabindex="0">
                             {/each}
                         </div>
-                    </div>
-
+                    {/if}
                 </div>
 
             </div>
-        </div>
-    {/if}
 
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="photo-popup hidden" bind:this={photoPopup} on:click={closePhotoPopup} role="button" tabindex="0">
-        <div class="content">
-            <img src="" alt="">
         </div>
     </div>
 </main>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class="photo-popup hidden" bind:this={photoPopup} on:click={closePhotoPopup} role="button" tabindex="0">
+    <div class="content">
+        <img src="" alt="">
+    </div>
+</div>
+
 <script>
     import { page } from "$app/stores";
-    import { Toast } from "$lib";
     import { title } from "$lib/store";
     import { GetRequest, PatchRequest } from "$lib/wailsjs/go/main/App";
     import { onMount } from "svelte";
-    import { capitalize, formatNumber } from "$lib";
+    import { Toast, capitalize, formatNumber, checkNull } from "$lib";
 
     let animeData = undefined;
     const fields = "status,genres,media_type,mean,rank,num_episodes,rating,my_list_status,alternative_titles,num_scoring_users,num_list_users,popularity,start_season,studios,synopsis,pictures"
@@ -425,6 +390,8 @@
                     grid-area: "1-image";
                     width: 21rem;
                     height: 30rem;
+                    min-width: 21rem;
+                    min-height: 30rem;
                     object-fit: cover;
                     user-select: none;
                     border-radius: 0.25rem;
