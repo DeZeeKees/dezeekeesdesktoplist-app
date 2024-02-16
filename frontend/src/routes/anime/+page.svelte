@@ -1,4 +1,9 @@
 <nav>
+    <a href="/">
+        <span class="material-symbols-outlined">
+            home
+        </span>
+    </a>
     <button on:click={() => {window.history.back()}}>
         <span class="material-symbols-outlined">
             arrow_back
@@ -122,6 +127,55 @@
             
             <div class="left block">
 
+                <h2>Genres</h2>
+                <div class="genres">
+                    {#if checkNull(animeData) !== "N/A"}
+                        {#each animeData?.genres as genre}
+                            <p class="genre">{genre.name}</p>
+                        {/each}
+                    {/if}
+                </div>
+
+                <h2>Synonyms</h2>
+                <div class="synonyms">
+                    {#if checkNull(animeData) !== "N/A"}
+                        {#each animeData?.alternative_titles?.synonyms as synonym}
+                            <p><span class="bold">{synonym}</span></p>
+                        {/each}
+                    {/if}
+                </div>
+
+                <h2>Extra Info</h2>
+                <div class="extra-info" >
+
+                    <!-- media type -->
+                    <p>Type: <span class="bold">{capitalize(checkNull(animeData?.media_type))}</span></p>
+
+                    <!-- num eps -->
+                    <p>Number of Episodes: <span class="bold">{checkNull(animeData?.num_episodes)}</span></p>
+
+                    <!-- status -->
+                    <p>Status: <span class="bold">
+                        {@html formatStatus(checkNull(animeData?.status))}
+                    </span></p>
+
+                    <!-- aired -->
+                    {#if checkNull(animeData?.start_season) !== "N/A"}
+                        <p>Aired: <span class="bold">{formatDate(animeData?.start_date)} to {formatDate(animeData?.end_date)}</span></p>
+                    {/if}
+
+                    <!-- broadcast -->
+                    <p>Broadcast: <span class="bold">
+                        {capitalize(checkNull(animeData?.broadcast?.day_of_the_week))} at {checkNull(animeData?.broadcast?.start_time)} JST
+                    </span></p>
+
+                    <!-- rating -->
+                    <p>Rating: <span class="bold">{formatRating(checkNull(animeData?.rating))}</span></p>
+
+                    <!-- source -->
+                    <p>Source: <span class="bold">{capitalize(checkNull(animeData?.source))}</span></p>
+
+                </div>
             </div>
 
             <div class="right fullwidth">
@@ -138,6 +192,16 @@
                         </div>
                     {/if}
                 </div>
+
+                {#if checkNull(animeData?.related_anime) !== "N/A" && animeData?.related_anime.length > 0}
+                    <div class="related block">
+                        {#each animeData?.related_anime as related}
+                            <a href={"/anime?id=" + related.node.id}>
+                                <span class="bold">{related.relation_type_formatted}</span>: {related.node.title}
+                            </a>
+                        {/each}
+                    </div>
+                {/if}
 
             </div>
 
@@ -156,11 +220,11 @@
     import { page } from "$app/stores";
     import { title } from "$lib/store";
     import { GetRequest, PatchRequest } from "$lib/wailsjs/go/main/App";
-    import { onMount } from "svelte";
-    import { Toast, capitalize, formatNumber, checkNull } from "$lib";
+    import { Toast, capitalize, formatNumber, checkNull, formatStatus, formatDate, formatRating } from "$lib";
+    import { afterNavigate } from "$app/navigation";
 
     let animeData = undefined;
-    const fields = "status,genres,media_type,mean,rank,num_episodes,rating,my_list_status,alternative_titles,num_scoring_users,num_list_users,popularity,start_season,studios,synopsis,pictures"
+    const fields = "status,genres,media_type,mean,rank,num_episodes,rating,my_list_status,alternative_titles,num_scoring_users,num_list_users,popularity,start_season,studios,synopsis,pictures,start_date,end_date,broadcast,source,related_anime"
 
     const selectOptions = ["watching", "completed", "on_hold", "dropped", "plan_to_watch"]
     const selectScores = [
@@ -179,7 +243,7 @@
 
     let photoPopup
 
-    onMount(async () => {
+    afterNavigate(async () => {
         title.set("Anime Details");
 
         const url = $page.url
@@ -196,6 +260,8 @@
         }
 
         animeData = JSON.parse(response.data);
+
+        console.log(animeData)
     })
 
     async function handleStatusSelectChange(event) {
@@ -307,13 +373,20 @@
 
 <style lang="less">
 
+    :global(span.bold) {
+        font-weight: 500;
+    }
+
     nav {
         width: 100%;
         padding: 0.25rem;
         display: flex;
         height: 2.5rem;
+        gap: 0.5rem;
 
-        button {
+        button, a {
+            all: unset;
+
             display: flex;
             justify-content: center;
             align-items: center;
@@ -364,9 +437,7 @@
                 flex-grow: 1;
             }
 
-            span.bold {
-                font-weight: 500;
-            }
+            
 
             .title {
                 grid-area: "title";
@@ -622,7 +693,50 @@
                 --_left-width: 21rem;
 
                 .left {
-                    width: 21rem;
+                    width: var(--_left-width);
+                    height: fit-content;
+
+                    h2 {
+                        font-size: 1.5rem;
+                        margin: 0;
+                    }
+
+                    .genres {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 0.5rem;
+                        width: 100%;
+                        padding: 0.5rem 0;
+
+                        .genre {
+                            all: unset;
+                            padding: 0.25rem 0.5rem;
+                            background-color: var(--mal-blue);
+                            color: var(--text-white);
+                            border-radius: 0.5rem;
+                        }
+                    }
+
+                    .synonyms {
+                        width: 100%;
+                        padding: 0.25rem 0;
+
+                        p {
+                            margin: 0;
+                            font-size: 1rem;
+                        }
+                    }
+
+                    .extra-info {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.25rem;
+
+                        p {
+                            margin: 0;
+                            font-size: 1rem;
+                        }
+                    }
                 }
 
                 .right {
@@ -659,6 +773,23 @@
                                 border-radius: 0.25rem;
                             }
                         }                        
+                    }
+
+                    .related {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5rem;
+
+                        a {
+                            font-size: 1.1rem;
+                            color: var(--mal-blue);
+                            text-decoration: none;
+                            cursor: pointer;
+
+                            &:hover {
+                                text-decoration: underline;
+                            }
+                        }
                     }
                 }
 
