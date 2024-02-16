@@ -60,10 +60,23 @@ export function formatDate(date) {
     }
 
     const formatter = new Intl.DateTimeFormat('en', { month: 'short' });
-    return `${d.getDate()} ${formatter.format(d)} ${d.getFullYear()}`
+    return `${formatter.format(d)} ${d.getDate()}, ${d.getFullYear()}`
 }
 
 export function checkNull(value) {
     if(value === null || value === undefined) return "N/A";
     return value;
+}
+
+export function formatStatus(status) {
+    switch(status) {
+        case "finished_airing":
+            return "<span style='color: #3F51B5;'>Finished Airing</span>";
+        case "currently_airing":
+            return "<span style='color: #4CAF50;'>Currently Airing</span>";
+        case "not_yet_aired":
+            return "<span style='color: #F44336;'>Not Yet Aired</span>";
+        default:
+            return status;
+    }
 }

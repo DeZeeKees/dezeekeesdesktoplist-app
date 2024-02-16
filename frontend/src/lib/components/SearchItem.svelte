@@ -10,7 +10,7 @@
         <p>
             {@html capitalize(data.node.media_type)} -
             {data.node.mean == null ? "N/A" : data.node.mean.toFixed(2)} -
-            {@html formatSearchStatus(data.node.status)}
+            {@html formatStatus(data.node.status)}
         </p>
         <p>Total Episodes: {data.node.num_episodes > 0 ? data.node.num_episodes : "?"}</p>
         <p>Rating: {formatRating(data.node.rating)}</p>
@@ -42,24 +42,11 @@
 <script>
     import { Toast } from "$lib";
     import { PatchRequest } from "$lib/wailsjs/go/main/App";
-    import { capitalize, formatRating, formatRank } from "$lib";
+    import { capitalize, formatRating, formatRank, formatStatus } from "$lib";
 
     export let data = {}
 
     let selectOptions = ["watching", "completed", "on_hold", "dropped", "plan_to_watch"]
-
-    function formatSearchStatus(status) {
-        switch(status) {
-            case "finished_airing":
-                return "<span style='color: #3F51B5;'>Finished Airing</span>";
-            case "currently_airing":
-                return "<span style='color: #4CAF50;'>Currently Airing</span>";
-            case "not_yet_aired":
-                return "<span style='color: #F44336;'>Not Yet Aired</span>";
-            default:
-                return status;
-        }
-    }
 
     function formatSearchGenres(genres) {
         let genresString = ""
